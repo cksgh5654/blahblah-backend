@@ -1,3 +1,5 @@
+const crypto = require("crypto");
+
 const generateOtp = (length) => {
   return crypto
     .randomInt(0, Math.pow(10, length))
