@@ -9,6 +9,15 @@ const createTempUser = async ({ email, password, otp }) => {
   }
 };
 
+const findTempUserById = async (id) => {
+  try {
+    const user = await TempUser.findById(id);
+    return user;
+  } catch (error) {
+    throw new Error("[DB Error] createTempUser", { cause: error });
+  }
+};
+
 const findTempUserByEmail = async ({ email }) => {
   try {
     const user = await TempUser.findOne({ email }).lean();
@@ -20,5 +29,6 @@ const findTempUserByEmail = async ({ email }) => {
 
 module.exports = {
   findTempUserByEmail,
+  findTempUserById,
   createTempUser,
 };
