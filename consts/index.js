@@ -3,6 +3,7 @@ require("dotenv").config();
 const config = {
   app: {
     port: process.env.PORT ?? 8080,
+    frontEndPoint: process.env.FRONT_END_POINT,
   },
   database: {
     url: process.env.MONGO_DB_URL,
@@ -16,6 +17,10 @@ const config = {
   },
   jwt: {
     secretKey: process.env.JWT_SECRET_KEY,
+  },
+  nodemailer: {
+    authEmail: process.env.NODEMAILER_AUTH_EMAIL,
+    authPass: process.env.NODEMAILER_AUTH_PASS,
   },
 };
 
