@@ -162,4 +162,45 @@ authController.post("/signup/otp/verify", async (req, res) => {
   }
 });
 
+authController.post("/signin/email", async (req, res) => {
+  const { email, password } = req.body;
+  if (!email) {
+    return res
+      .status(400)
+      .json({ isError: true, message: "이메일이 필요합니다." });
+  }
+  if (!password) {
+    return res
+      .status(400)
+      .json({ isError: true, message: "페스워드가 필요합니다." });
+  }
+
+  try {
+    const user = await findUserByEmail(email);
+    if (!user) {
+      return res
+        .status(404)
+        .json({ isError: true, message: "잘못된 정보 요청 입니다." });
+    }
+    const hashedPassword = createHashedPassword(password);
+    const { password: pwFromDB, _id } = user;
+    if (hashedPassword !== pwFromDB) {
+      return res.status(400).json({
+        isError: true,
+        message: "이메일 또는 패스워드가 잘못되었습니다.",
+      });
+    }
+    const token = createToken({ email, _id });
+    res.cookie("token", token, {
+      httpOnly: true,
+      expires: 1000 * 60 * 60,
+      path: "/",
+    });
+
+    return res.status(200).json({ isError: false, message: "로그인 완료" });
+  } catch (error) {
+    console.log(error);
+  }
+});
+
 module.exports = authController;
