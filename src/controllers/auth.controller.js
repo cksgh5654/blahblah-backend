@@ -1,8 +1,14 @@
 const config = require("../../consts");
 const axios = require("axios");
-const User = require("../schemas/user.schema");
 const { findUserByEmail, createUser } = require("../services/user.service");
-const { createToken } = require("../utils/token");
+const { createToken, verifyToken } = require("../utils/token");
+const { generateOtp, createHashedPassword } = require("../utils/index.util");
+const {
+  findTempUserByEmail,
+  createTempUser,
+  findTempUserById,
+} = require("../services/tempUser.service");
+const { sendMailForSignup } = require("../utils/nodemailer.util");
 const authController = require("express").Router();
 
 authController.get("/google-entry-url", (_req, res) => {
@@ -48,6 +54,111 @@ authController.get("/google-oauth-redirect", async (req, res) => {
       .json({ isError: true, message: "구글 계정 연결에 실패했습니다." });
   } catch (error) {
     console.log(error);
+    return res
+      .status(500)
+      .json({ isError: true, message: "구글 계정 연결에 실패했습니다." });
+  }
+});
+
+authController.post("/signup/otp", async (req, res) => {
+  const { email, password } = req.body;
+  if (!email) {
+    return res
+      .status(400)
+      .json({ isError: true, message: "이메일이 필요합니다." });
+  }
+  if (!password) {
+    return res
+      .status(400)
+      .json({ isError: true, message: "비밀번호가 필요합니다." });
+  }
+
+  try {
+    const user = await findUserByEmail({ email });
+    if (user) {
+      return res
+        .status(400)
+        .json({ isError: true, message: "이미 가입된 이메일 계정 입니다." });
+    }
+
+    let tempUser = await findTempUserByEmail({ email });
+    const otp = generateOtp(6);
+    const hashedPassword = createHashedPassword(password);
+    if (!tempUser) {
+      tempUser = await createTempUser({ email, password: hashedPassword, otp });
+    }
+    await sendMailForSignup(email, otp);
+
+    const otpToken = createToken({
+      email,
+      userId: tempUser._id,
+      expires: 1000 * 60 * 5,
+    });
+    res.cookie("otpToken", otpToken, {
+      maxAge: 1000 * 60 * 5,
+      httpOnly: true,
+      path: "/",
+    });
+
+    return res.status(200).json({
+      isError: false,
+      message: "이메일 회원가입 otp 요청에 성공 했습니다.",
+    });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .json({ isError: true, message: "이메일 OTP 요청에 실패 했습니다." });
+  }
+});
+
+authController.post("/signup/otp/verify", async (req, res) => {
+  const { otpToken } = req.cookies;
+  if (!otpToken) {
+    return res
+      .status(400)
+      .json({ isError: true, message: "쿠키가 만료되었습니다." });
+  }
+
+  const { otp } = req.body;
+  if (!otp) {
+    return res
+      .status(400)
+      .json({ isError: true, message: "otp 번호가 필요합니다." });
+  }
+
+  const { userId } = verifyToken(otpToken);
+  try {
+    const tempUser = await findTempUserById(userId);
+    if (!tempUser) {
+      return res
+        .status(400)
+        .json({ isError: true, message: "유효하지 않은 OTP 요청입니다." });
+    }
+    if (otp !== tempUser.otp) {
+      return res
+        .status(400)
+        .json({ isError: false, message: "otp 정보가 잘못 되었습니다." });
+    }
+
+    const { email, _id } = await createUser({
+      email: tempUser.email,
+      password: tempUser.password,
+    });
+    const token = createToken({ email, userId: _id });
+    res.cookie("token", token, {
+      httpOnly: true,
+      maxAge: 1000 * 60 * 60,
+      path: "/",
+    });
+    return res
+      .status(201)
+      .json({ isError: false, message: "회원가입에 성공 하였습니다." });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .json({ isError: true, message: "otp 인증에 실패했습니다." });
   }
 });
 
