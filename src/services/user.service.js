@@ -1,8 +1,8 @@
 const User = require("../schemas/user.schema");
 
-const createUser = async ({ email, name, image }) => {
+const createUser = async ({ email, password, name, image }) => {
   try {
-    const user = User.create({ email, name, image });
+    const user = User.create({ email, name, password, image });
     return user;
   } catch (error) {
     throw new Error("[DB Error] createUser", { cause: error });
