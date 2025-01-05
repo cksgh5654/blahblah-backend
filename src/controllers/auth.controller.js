@@ -74,7 +74,7 @@ authController.post("/signup/otp", async (req, res) => {
   }
 
   try {
-    const user = await findUserByEmail({ email });
+    const user = await findUserByEmail(email);
     if (user) {
       return res
         .status(400)

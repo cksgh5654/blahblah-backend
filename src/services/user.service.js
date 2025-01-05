@@ -9,7 +9,7 @@ const createUser = async ({ email, password, name, image }) => {
   }
 };
 
-const findUserByEmail = async ({ email }) => {
+const findUserByEmail = async (email) => {
   try {
     const user = await User.findOne({ email }).lean();
     return user;
