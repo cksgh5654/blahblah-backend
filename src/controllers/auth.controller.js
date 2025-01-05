@@ -49,9 +49,6 @@ authController.get("/google-oauth-redirect", async (req, res) => {
       });
       res.redirect("http://localhost:5173");
     }
-    return res
-      .status(500)
-      .json({ isError: true, message: "구글 계정 연결에 실패했습니다." });
   } catch (error) {
     console.log(error);
     return res
