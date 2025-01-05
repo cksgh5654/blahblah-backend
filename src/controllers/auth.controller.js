@@ -47,7 +47,7 @@ authController.get("/google-oauth-redirect", async (req, res) => {
         httpOnly: true,
         path: "/",
       });
-      res.redirect("http://localhost:5173");
+      res.redirect(config.app.frontEndPoint);
     }
   } catch (error) {
     console.log(error);
