@@ -1,5 +1,5 @@
 const mongoose = require("../../mongodb_init");
-const { String, Date } = mongoose.Schema.Types;
+const { String } = mongoose.Schema.Types;
 
 const tempUserSchema = new mongoose.Schema({
   email: {
@@ -15,9 +15,9 @@ const tempUserSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  createdAt: {
+  expireAt: {
     type: Date,
-    default: Date.now,
+    default: Date,
     expires: 300,
   },
 });
