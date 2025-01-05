@@ -20,7 +20,7 @@ const userSchema = new mongoose.Schema(
     },
   },
   {
-    timeseries: {
+    timestamps: {
       createdAt: true,
     },
   }
