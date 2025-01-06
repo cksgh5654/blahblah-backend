@@ -18,7 +18,7 @@ const findTempUserById = async (id) => {
   }
 };
 
-const findTempUserByEmail = async ({ email }) => {
+const findTempUserByEmail = async (email) => {
   try {
     const user = await TempUser.findOne({ email }).lean();
     return user;

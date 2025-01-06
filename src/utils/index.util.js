@@ -1,6 +1,6 @@
 const crypto = require("crypto");
 
-const generateOtp = (length) => {
+const createOtp = (length) => {
   return crypto
     .randomInt(0, Math.pow(10, length))
     .toString()
@@ -12,6 +12,6 @@ const createHashedPassword = (password) => {
 };
 
 module.exports = {
-  generateOtp,
+  createOtp,
   createHashedPassword,
 };
