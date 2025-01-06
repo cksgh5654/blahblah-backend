@@ -1,5 +1,5 @@
 const mongoose = require("../../mongodb_init");
-const { String, Number } = mongoose.Schema.Types;
+const { String } = mongoose.Schema.Types;
 
 const categorySchema = new mongoose.Schema(
   {
@@ -10,11 +10,6 @@ const categorySchema = new mongoose.Schema(
     imgUrl: {
       type: String,
       required: true,
-    },
-    id: {
-      type: Number,
-      required: true,
-      unique: true,
     },
   },
   {
