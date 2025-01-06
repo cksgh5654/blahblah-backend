@@ -1,8 +1,8 @@
 const User = require("../schemas/user.schema");
 
-const createUser = async ({ email, password, name, image }) => {
+const createUser = async ({ email, password, nickname, image }) => {
   try {
-    const user = User.create({ email, name, password, image });
+    const user = User.create({ email, nickname, password, image });
     return user;
   } catch (error) {
     throw new Error("[DB Error] createUser", { cause: error });
@@ -11,7 +11,7 @@ const createUser = async ({ email, password, name, image }) => {
 
 const findUserByEmail = async (email) => {
   try {
-    const user = await User.findOne({ email }).lean();
+    const user = await User.findOne({ email }, "-_id -__v").lean();
     return user;
   } catch (error) {
     throw new Error("[DB Error] findUserByEmail", { cause: error });

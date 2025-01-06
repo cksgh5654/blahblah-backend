@@ -43,10 +43,12 @@ authController.get("/google-oauth-redirect", async (req, res) => {
       }
     );
     if (request.data) {
-      const { email, name, picture: image } = request.data;
+      const { email, picture: image } = request.data;
       let user = await findUserByEmail(email);
       if (!user) {
-        user = await createUser({ email, name, image });
+        const nickname = email.split("@")[0];
+        console.log(nickname);
+        user = await createUser({ email, nickname, image });
       }
       const token = createToken({ email, userId: user._id });
       res.cookie("token", token, {
@@ -148,6 +150,7 @@ authController.post("/signup/otp/verify", async (req, res) => {
     const { email, _id } = await createUser({
       email: tempUser.email,
       password: tempUser.password,
+      nickname: tempUser.email.split("@")[0],
     });
     const token = createToken({ email, userId: _id });
     res.cookie("token", token, {
