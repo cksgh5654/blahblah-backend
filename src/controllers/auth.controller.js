@@ -47,7 +47,6 @@ authController.get("/google-oauth-redirect", async (req, res) => {
       let user = await findUserByEmail(email);
       if (!user) {
         const nickname = email.split("@")[0];
-        console.log(nickname);
         user = await createUser({ email, nickname, image });
       }
       const token = createToken({ email, userId: user._id });

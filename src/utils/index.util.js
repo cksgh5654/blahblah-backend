@@ -11,7 +11,17 @@ const createHashedPassword = (password) => {
   return crypto.createHash("sha512").update(password).digest("base64");
 };
 
+const removeUndefinedFields = (object) => {
+  return Object.keys(object).reduce((acc, key) => {
+    if (object[key] !== undefined) {
+      acc[key] = object[key];
+    }
+    return acc;
+  }, {});
+};
+
 module.exports = {
   createOtp,
   createHashedPassword,
+  removeUndefinedFields,
 };

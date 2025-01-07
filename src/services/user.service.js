@@ -1,3 +1,4 @@
+const { removeUndefinedFields } = require("../utils/index.util");
 const User = require("../schemas/user.schema");
 
 const createUser = async ({ email, password, nickname, image }) => {
@@ -13,7 +14,7 @@ const findUserByEmail = async (email) => {
   try {
     const user = await User.findOne(
       { email },
-      "email nickname image createdAt -_id"
+      "email nickname image createdAt _id"
     ).lean();
     return user;
   } catch (error) {
@@ -33,9 +34,15 @@ const findUserByNickname = async (nickname) => {
   }
 };
 
-const updateUserById = async (id, { password }) => {
+const updateUserById = async (id, { email, nickname, image, password }) => {
+  const filterdObject = removeUndefinedFields({
+    email,
+    nickname,
+    image,
+    password,
+  });
   try {
-    const user = await User.findByIdAndUpdate(id, { password });
+    const user = await User.findByIdAndUpdate(id, filterdObject);
     return user;
   } catch (error) {
     throw new Error("[DB Error] updateUserById", { cause: error });
