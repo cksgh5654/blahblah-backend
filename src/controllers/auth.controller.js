@@ -298,4 +298,14 @@ authController.post("/password-reset/otp/verify", async (req, res) => {
     console.log(error);
   }
 });
+
+authController.post("/signout", async (req, res) => {
+  try {
+    res.clearCookie("token");
+    return res.status(200).json({ isError: false, message: "로그아웃 완료" });
+  } catch (error) {
+    console.log(error);
+  }
+});
+
 module.exports = authController;
