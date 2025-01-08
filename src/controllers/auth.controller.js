@@ -189,21 +189,21 @@ authController.post("/signin/email", async (req, res) => {
         .json({ isError: true, message: "잘못된 정보 요청 입니다." });
     }
     const hashedPassword = createHashedPassword(password);
-    const { password: pwFromDB, _id } = user;
+    const { password: pwFromDB, _id, ...rest } = user;
     if (hashedPassword !== pwFromDB) {
       return res.status(400).json({
         isError: true,
         message: "이메일 또는 패스워드가 잘못되었습니다.",
       });
     }
-    const token = createToken({ email, _id });
+    const token = createToken({ email, userId: _id });
     res.cookie("token", token, {
       httpOnly: true,
-      expires: 1000 * 60 * 60,
+      maxAge: 1000 * 60 * 60,
       path: "/",
     });
 
-    return res.status(200).json({ isError: false, message: "로그인 완료" });
+    return res.status(200).json({ isError: false, user: { ...rest } });
   } catch (error) {
     console.log(error);
   }
@@ -305,6 +305,32 @@ authController.post("/signout", async (req, res) => {
     return res.status(200).json({ isError: false, message: "로그아웃 완료" });
   } catch (error) {
     console.log(error);
+  }
+});
+
+authController.get("/signin-status", async (req, res) => {
+  try {
+    const { token } = req.cookies;
+    if (!token) {
+      return res
+        .status(200)
+        .json({ isError: false, data: { user: {}, signinStatus: false } });
+    }
+    const { email } = verifyToken(token);
+    const user = await findUserByEmail(email);
+    if (!user) {
+      return res
+        .status(404)
+        .json({ isError: true, message: "잘못된 정보 요청 입니다." });
+    }
+    return res
+      .status(200)
+      .json({ isError: false, data: { user, signinStatus: true } });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .json({ isError: true, message: "상태 확인중 에러가 발생했습니다." });
   }
 });
 
