@@ -12,10 +12,7 @@ const createUser = async ({ email, password, nickname, image }) => {
 
 const findUserByEmail = async (email) => {
   try {
-    const user = await User.findOne(
-      { email },
-      "email nickname image createdAt _id"
-    ).lean();
+    const user = await User.findOne({ email }).lean();
     return user;
   } catch (error) {
     throw new Error("[DB Error] findUserByEmail", { cause: error });
