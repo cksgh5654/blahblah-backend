@@ -1,4 +1,4 @@
-const mongoose = require("../../mongodb_init");
+const mongoose = require('../../mongodb_init');
 const { String, ObjectId } = mongoose.Schema.Types;
 
 const commentSchema = new mongoose.Schema(
@@ -6,16 +6,20 @@ const commentSchema = new mongoose.Schema(
     creator: {
       type: ObjectId,
       required: true,
-      ref: "User",
+      ref: 'User',
     },
     post: {
       type: ObjectId,
       required: true,
-      ref: "Post",
+      ref: 'Post',
     },
-    description: {
+    content: {
       type: String,
       required: true,
+    },
+    deleteAt: {
+      type: String,
+      default: null,
     },
   },
   {
@@ -26,5 +30,5 @@ const commentSchema = new mongoose.Schema(
   }
 );
 
-const Comment = mongoose.model("Comments", commentSchema);
+const Comment = mongoose.model('Comments', commentSchema);
 module.exports = Comment;

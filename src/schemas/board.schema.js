@@ -1,4 +1,4 @@
-const mongoose = require("../../mongodb_init");
+const mongoose = require('../../mongodb_init');
 const { String, ObjectId } = mongoose.Schema.Types;
 
 const boardSchema = new mongoose.Schema(
@@ -8,35 +8,40 @@ const boardSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
-    description: {
+    content: {
       type: String,
       required: true,
     },
-    imgUrl: {
+    image: {
       type: String,
       required: true,
     },
-    address: {
+    url: {
       type: String,
       required: true,
     },
     category: {
       type: ObjectId,
       required: true,
-      ref: "Category",
+      ref: 'Category',
     },
     manager: {
       type: ObjectId,
       required: true,
-      ref: "User",
+      ref: 'User',
+    },
+    deleteAt: {
+      type: String,
+      default: null,
     },
   },
   {
     timestamps: {
       createdAt: true,
+      updatedAt: true,
     },
   }
 );
 
-const Board = mongoose.model("Boards", boardSchema);
+const Board = mongoose.model('Boards', boardSchema);
 module.exports = Board;
