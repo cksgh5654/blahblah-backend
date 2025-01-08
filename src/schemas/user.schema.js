@@ -1,4 +1,4 @@
-const mongoose = require("../../mongodb_init");
+const mongoose = require('../../mongodb_init');
 const { String } = mongoose.Schema.Types;
 
 const userSchema = new mongoose.Schema(
@@ -16,15 +16,20 @@ const userSchema = new mongoose.Schema(
     },
     image: {
       type: String,
-      default: "",
+      default: '',
+    },
+    deleteAt: {
+      type: String,
+      default: null,
     },
   },
   {
     timestamps: {
       createdAt: true,
+      updatedAt: true,
     },
   }
 );
 
-const User = mongoose.model("users", userSchema);
+const User = mongoose.model('users', userSchema);
 module.exports = User;

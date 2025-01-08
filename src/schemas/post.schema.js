@@ -21,6 +21,10 @@ const postSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    deleteAt: {
+      type: String,
+      default: null,
+    },
   },
   {
     timestamps: {
