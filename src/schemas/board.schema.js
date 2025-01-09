@@ -28,7 +28,7 @@ const boardSchema = new mongoose.Schema(
     manager: {
       type: ObjectId,
       required: true,
-      ref: "User",
+      ref: "users",
     },
     deleteAt: {
       type: String,
@@ -43,5 +43,5 @@ const boardSchema = new mongoose.Schema(
   }
 );
 
-const Board = mongoose.model("Boards", boardSchema);
+const Board = mongoose.model("boards", boardSchema);
 module.exports = Board;
