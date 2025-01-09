@@ -20,6 +20,21 @@ const createBoard = async (data) => {
   }
 };
 
+const getBoardsByCategoryName = async (name) => {
+  try {
+    const boards = await Board.find({ category: name }).populate(
+      "manager",
+      "email nickname"
+    );
+
+    return { isError: false, data: boards };
+  } catch (err) {
+    console.log(`getBoardsByCategoryName 에러 ${err}`);
+    return { isError: true, message: "게시판 가져오기 실패" };
+  }
+};
+
 module.exports = {
   createBoard,
+  getBoardsByCategoryName,
 };
