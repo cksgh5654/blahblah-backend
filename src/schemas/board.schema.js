@@ -51,5 +51,5 @@ const boardSchema = new mongoose.Schema(
   }
 );
 
-const Board = mongoose.model("Boards", boardSchema);
+const Board = mongoose.model("boards", boardSchema);
 module.exports = Board;

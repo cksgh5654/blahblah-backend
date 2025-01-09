@@ -6,6 +6,12 @@ const {
   getBoardsByCategoryName,
 } = require("../services/board.service");
 
+const { createBoard, getBoardById } = require("../services/board.service");
+const {
+  updateBoardUser,
+  getBoardUsersCount,
+  getBoardUsersById,
+} = require("../services/BoardUser.service");
 const boardController = require("express").Router();
 
 boardController.post("/submit", withAuth, async (req, res) => {
@@ -55,6 +61,33 @@ boardController.get("/category/:name", async (req, res) => {
   } catch (error) {
     console.error(error);
     return res.status(500).json({ isError: true, message: error.message });
+  }
+});
+
+boardController.get("/boardId/:boardId", withAuth, async (req, res) => {
+  const { boardId } = req.params;
+  try {
+    const board = await getBoardById(boardId);
+    return res.status(200).json({ isError: false, board });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      isError: true,
+      message: "게시판 정보를 가져오는데 실패했습니다.",
+    });
+  }
+});
+
+boardController.get("/managerId", withAuth, async (req, res) => {
+  try {
+    const board = await getBoardByManagerId(req.userId);
+    return res.status(200).json({ isError: false, board });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      isError: true,
+      message: "게시판 데이터를 가져오는데 실패했습니다.",
+    });
   }
 });
 
