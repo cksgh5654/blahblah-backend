@@ -6,12 +6,12 @@ const postSchema = new mongoose.Schema(
     creator: {
       type: ObjectId,
       required: true,
-      ref: 'User',
+      ref: 'users',
     },
     board: {
       type: ObjectId,
       required: true,
-      ref: 'Board',
+      ref: 'Boards',
     },
     title: {
       type: String,
