@@ -34,7 +34,29 @@ const getBoardsByCategoryName = async (name) => {
   }
 };
 
+const getBoardById = async (id) => {
+  try {
+    const board = await Board.findOne({ _id: id }) //
+      .populate("manager")
+      .lean();
+    return board;
+  } catch (error) {
+    throw new Error(`[DB Error] getBoardById`, { cause: error });
+  }
+};
+
+const getBoardByManagerId = async (id) => {
+  try {
+    const board = await Board.find({ manager: id }).lean();
+    return board;
+  } catch (error) {
+    throw new Error(`[DB Error] getBoardByManagerId`, { cause: error });
+  }
+};
+
 module.exports = {
   createBoard,
   getBoardsByCategoryName,
+  getBoardById,
+  getBoardByManagerId,
 };
