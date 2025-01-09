@@ -127,4 +127,23 @@ boardController.delete(
   }
 );
 
+boardController.put("/:boardId/users/:userId", withAuth, async (req, res) => {
+  const { boardId, userId } = req.params;
+  const { joinedStatus } = req.body;
+  const updatedData = joinedStatus
+    ? { joinedStatus }
+    : { joinedStatus, deletedAt: Date.now() };
+  try {
+    await updateBoardUser(boardId, userId, updatedData);
+    return res
+      .status(200)
+      .json({ isError: false, message: "유저 정보를 수정하였습니다." });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .json({ isError: true, message: "유저 정보를 수정하는데 실패했습니다." });
+  }
+});
+
 module.exports = boardController;
