@@ -66,4 +66,43 @@ boardController.get("/managerId", withAuth, async (req, res) => {
   }
 });
 
+boardController.get("/:boardId/users", withAuth, async (req, res) => {
+  const { boardId } = req.params;
+  const page = Number(req.query.page);
+  const limit = Number(req.query.limit);
+  if (!page) {
+    return res
+      .status(500)
+      .json({ isError: true, message: "페이지 정보가 필요합니다." });
+  }
+  try {
+    const [users, totalUsersCount] = await Promise.all([
+      getBoardUsersById(boardId, { limit, page }),
+      getBoardUsersCount(boardId),
+    ]);
+    const totalPage = Math.ceil(totalUsersCount / limit);
+    const nextPage = page + 1 > totalPage ? totalPage : page + 1;
+    const prevPage = page - 1 === 0 ? page : page - 1;
+    return res.status(200).json({
+      isError: false,
+      data: {
+        users,
+        pageInfo: {
+          currentPage: page,
+          nextPage,
+          prevPage,
+          totalPage,
+          totalUsersCount,
+        },
+      },
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      isError: true,
+      message: "게시판 유저 정보를 가져오는데 실패했습니다.",
+    });
+  }
+});
+
 module.exports = boardController;
