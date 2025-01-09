@@ -4,9 +4,6 @@ const { withAuth } = require("../middleware/auth.middleware");
 const {
   createBoard,
   getBoardsByCategoryName,
-} = require("../services/board.service");
-const { createBoard, getBoardById } = require("../services/board.service");
-const {
   getBoardById,
   getBoardByManagerId,
 } = require("../services/board.service");
