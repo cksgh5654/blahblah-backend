@@ -24,9 +24,8 @@ userController.get("/me", withAuth, async (req, res) => {
 
 userController.get("/profile", async (req, res) => {
   try {
-    const { nickname: query } = req.query;
-    const nickname = query.replace("@", "");
-    const user = await findUserByNickname(nickname);
+    const { email } = req.query;
+    const user = await findUserByEmail(email);
     if (!user) {
       return res
         .status(404)
