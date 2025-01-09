@@ -1,7 +1,11 @@
 const jwt = require("jsonwebtoken");
 const config = require("../../consts");
 const { withAuth } = require("../middleware/auth.middleware");
-const { createBoard, getBoardById } = require("../services/board.service");
+const {
+  createBoard,
+  getBoardById,
+  getBoardByManagerId,
+} = require("../services/board.service");
 const {
   updateBoardUser,
   getBoardUsersCount,
