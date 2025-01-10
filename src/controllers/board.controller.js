@@ -12,6 +12,7 @@ const {
   getBoardUsersCount,
   getBoardUsersById,
 } = require("../services/BoardUser.service");
+const { getPostByBoardId } = require("../services/post.service");
 const boardController = require("express").Router();
 
 boardController.post("/submit", withAuth, async (req, res) => {
@@ -168,6 +169,20 @@ boardController.put("/:boardId/users/:userId", withAuth, async (req, res) => {
     return res
       .status(500)
       .json({ isError: true, message: "유저 정보를 수정하는데 실패했습니다." });
+  }
+});
+
+boardController.get("/:boardId/posts", withAuth, async (req, res) => {
+  const { boardId } = req.params;
+  try {
+    const posts = await getPostByBoardId(boardId);
+    return res.status(200).json({ isError: false, posts });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      isError: true,
+      message: "게시글 정보를 가져오는데 실패했습니다.",
+    });
   }
 });
 

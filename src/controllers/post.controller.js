@@ -1,26 +1,26 @@
-const { withAuth } = require('../middleware/auth.middleware');
+const { withAuth } = require("../middleware/auth.middleware");
 const {
   createPost,
   getPost,
   updatePost,
   deletePost,
-} = require('../services/post.service');
-const postController = require('express').Router();
+} = require("../services/post.service");
+const postController = require("express").Router();
 
-postController.post('/create', withAuth, async (req, res) => {
+postController.post("/create", withAuth, async (req, res) => {
   const { boardId, title, content } = req.body;
   const creator = req.userId;
 
   if (!title || !content) {
     return res
       .status(400)
-      .json({ isError: true, message: '모든 필드를 입력해주세요.' });
+      .json({ isError: true, message: "모든 필드를 입력해주세요." });
   }
 
   if (!boardId) {
     return res
       .status(400)
-      .json({ isError: true, message: '등록된 게시판이 아닙니다.' });
+      .json({ isError: true, message: "등록된 게시판이 아닙니다." });
   }
 
   try {
@@ -32,20 +32,20 @@ postController.post('/create', withAuth, async (req, res) => {
 
     return res
       .status(201)
-      .json({ isError: false, message: '게시글이 등록되었습니다.' });
+      .json({ isError: false, message: "게시글이 등록되었습니다." });
   } catch (err) {
     console.error(`[post/create]: ${err}`);
     return res.status(500).json({ isError: true, message: `${err}` });
   }
 });
 
-postController.get('/detail/:postId', withAuth, async (req, res) => {
+postController.get("/detail/:postId", withAuth, async (req, res) => {
   const { postId } = req.params;
 
   if (!postId) {
     return res
       .status(400)
-      .json({ isError: true, message: '등록된 게시글이 없습니다.' });
+      .json({ isError: true, message: "등록된 게시글이 없습니다." });
   }
 
   try {
@@ -62,7 +62,7 @@ postController.get('/detail/:postId', withAuth, async (req, res) => {
   }
 });
 
-postController.post('/update/:postId', withAuth, async (req, res) => {
+postController.post("/update/:postId", withAuth, async (req, res) => {
   const { title, content } = req.body;
   const { postId } = req.params;
   const creator = req.userId;
@@ -72,20 +72,20 @@ postController.post('/update/:postId', withAuth, async (req, res) => {
   if (!creator) {
     return res.status(401).json({
       isError: true,
-      message: '로그인 유지시간이 만료되었습니다. 다시 로그인해주세요.',
+      message: "로그인 유지시간이 만료되었습니다. 다시 로그인해주세요.",
     });
   }
 
   if (!title || !content) {
     return res
       .status(400)
-      .json({ isError: true, message: '모든 필드를 입력해주세요.' });
+      .json({ isError: true, message: "모든 필드를 입력해주세요." });
   }
 
   if (!postId) {
     return res
       .status(400)
-      .json({ isError: true, message: '게시글 정보가 없습니다.' });
+      .json({ isError: true, message: "게시글 정보가 없습니다." });
   }
 
   try {
@@ -97,28 +97,28 @@ postController.post('/update/:postId', withAuth, async (req, res) => {
 
     return res
       .status(200)
-      .json({ isError: false, message: '게시글이 수정되었습니다.' });
+      .json({ isError: false, message: "게시글이 수정되었습니다." });
   } catch (err) {
     console.error(`[post/update]: ${err}`);
     return res.status(500).json({ isError: true, message: `${err}` });
   }
 });
 
-postController.get('/delete/:postId', withAuth, async (req, res) => {
+postController.get("/delete/:postId", withAuth, async (req, res) => {
   const { postId } = req.params;
   const creator = req.userId;
-
+  console.log(postId);
   if (!creator) {
     return res.status(401).json({
       isError: true,
-      message: '로그인 유지시간이 만료되었습니다. 다시 로그인해주세요.',
+      message: "로그인 유지시간이 만료되었습니다. 다시 로그인해주세요.",
     });
   }
 
   if (!postId) {
     return res
       .status(400)
-      .json({ isError: true, message: '게시글 정보가 없습니다.' });
+      .json({ isError: true, message: "게시글 정보가 없습니다." });
   }
 
   try {
@@ -130,7 +130,7 @@ postController.get('/delete/:postId', withAuth, async (req, res) => {
 
     return res
       .status(200)
-      .json({ isError: false, message: '게시글이 삭제되었습니다.' });
+      .json({ isError: false, message: "게시글이 삭제되었습니다." });
   } catch (err) {
     console.error(`[post/delete]: ${err}`);
     return res.status(500).json({ isError: true, message: `${err}` });
