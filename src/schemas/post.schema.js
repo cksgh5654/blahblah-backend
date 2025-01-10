@@ -1,17 +1,17 @@
-const mongoose = require('../../mongodb_init');
-const { String, ObjectId } = mongoose.Schema.Types;
+const mongoose = require("../../mongodb_init");
+const { String, ObjectId, Date } = mongoose.Schema.Types;
 
 const postSchema = new mongoose.Schema(
   {
     creator: {
       type: ObjectId,
       required: true,
-      ref: 'users',
+      ref: "users",
     },
     board: {
       type: ObjectId,
       required: true,
-      ref: 'Boards',
+      ref: "Boards",
     },
     title: {
       type: String,
@@ -21,8 +21,8 @@ const postSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    deleteAt: {
-      type: String,
+    deletedAt: {
+      type: Date,
       default: null,
     },
   },
@@ -34,5 +34,5 @@ const postSchema = new mongoose.Schema(
   }
 );
 
-const Post = mongoose.model('Posts', postSchema);
+const Post = mongoose.model("Posts", postSchema);
 module.exports = Post;
