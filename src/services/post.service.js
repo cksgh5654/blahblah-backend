@@ -73,10 +73,19 @@ const getPostByBoardId = async (boardId) => {
   }
 };
 
+const getBoardPostsCount = async (boardId) => {
+  try {
+    return await Post.find({ board: boardId }).countDocuments();
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
 module.exports = {
   createPost,
   getPost,
   updatePost,
   deletePost,
   getPostByBoardId,
+  getBoardPostsCount,
 };

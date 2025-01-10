@@ -12,7 +12,10 @@ const {
   getBoardUsersCount,
   getBoardUsersById,
 } = require("../services/BoardUser.service");
-const { getPostByBoardId } = require("../services/post.service");
+const {
+  getPostByBoardId,
+  getBoardPostsCount,
+} = require("../services/post.service");
 const boardController = require("express").Router();
 
 boardController.post("/submit", withAuth, async (req, res) => {
@@ -174,9 +177,29 @@ boardController.put("/:boardId/users/:userId", withAuth, async (req, res) => {
 
 boardController.get("/:boardId/posts", withAuth, async (req, res) => {
   const { boardId } = req.params;
+  const page = Number(req.query.page) || 1;
+  const limit = Number(req.query.limit) || 20;
   try {
-    const posts = await getPostByBoardId(boardId);
-    return res.status(200).json({ isError: false, posts });
+    const [posts, totalPostsCount] = await Promise.all([
+      getPostByBoardId(boardId, { limit, page }),
+      getBoardPostsCount(boardId),
+    ]);
+    const totalPage = Math.ceil(totalPostsCount / limit);
+    const nextPage = page + 1 > totalPage ? totalPage : page + 1;
+    const prevPage = page - 1 === 0 ? page : page - 1;
+    return res.status(200).json({
+      isError: false,
+      data: {
+        posts,
+        pageInfo: {
+          currentPage: page,
+          nextPage,
+          prevPage,
+          totalPage,
+          totalPostsCount,
+        },
+      },
+    });
   } catch (error) {
     console.log(error);
     return res.status(500).json({
