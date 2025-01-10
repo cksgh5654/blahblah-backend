@@ -25,6 +25,11 @@ const postSchema = new mongoose.Schema(
       type: Date,
       default: null,
     },
+    type: {
+      type: String,
+      enum: ["basic", "notification"],
+      default: "basic",
+    },
   },
   {
     timestamps: {
