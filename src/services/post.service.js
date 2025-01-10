@@ -15,7 +15,9 @@ const createPost = async ({ creator, boardId: board, title, content }) => {
 };
 
 const getPost = async ({ postId: _id }) => {
-  const post = await Post.findOne({ _id }).lean();
+  const post = await Post.findOne({ _id })
+    .populate('creator', 'image nickname')
+    .lean();
 
   if (!post) {
     const errorMsg = '게시글 조회에 실패했습니다.';
@@ -43,7 +45,12 @@ const updatePost = async ({ postId: _id, title, content }) => {
 };
 
 const deletePost = async ({ postId: _id }) => {
-  const post = await Post.findOneAndUpdate({ _id }, { deleteAt: true }).lean();
+  const deletedDate = new Date('yyyy-mm-dd hh:mm:ss');
+
+  const post = await Post.findOneAndUpdate(
+    { _id },
+    { deletedAt: deletedDate }
+  ).lean();
 
   if (!post) {
     const errorMsg = '게시글 삭제에 실패했습니다.';

@@ -67,8 +67,6 @@ postController.post('/update/:postId', withAuth, async (req, res) => {
   const { postId } = req.params;
   const creator = req.userId;
 
-  console.log(title, content, postId, creator);
-
   if (!creator) {
     return res.status(401).json({
       isError: true,
@@ -104,7 +102,7 @@ postController.post('/update/:postId', withAuth, async (req, res) => {
   }
 });
 
-postController.get('/delete/:postId', withAuth, async (req, res) => {
+postController.delete('/:postId', withAuth, async (req, res) => {
   const { postId } = req.params;
   const creator = req.userId;
 
@@ -132,7 +130,7 @@ postController.get('/delete/:postId', withAuth, async (req, res) => {
       .status(200)
       .json({ isError: false, message: '게시글이 삭제되었습니다.' });
   } catch (err) {
-    console.error(`[post/delete]: ${err}`);
+    console.error(`[post/:postId]: ${err}`);
     return res.status(500).json({ isError: true, message: `${err}` });
   }
 });
