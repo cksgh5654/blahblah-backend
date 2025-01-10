@@ -38,7 +38,7 @@ const boardSchema = new mongoose.Schema(
       required: true,
       ref: "users",
     },
-    deleteAt: {
+    deletedAt: {
       type: String,
       default: null,
     },
