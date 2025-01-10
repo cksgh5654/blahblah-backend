@@ -1,7 +1,13 @@
 const Post = require("../schemas/post.schema");
 
-const createPost = async ({ creator, boardId: board, title, content }) => {
-  const post = await Post.create({ creator, board, title, content });
+const createPost = async ({
+  creator,
+  boardId: board,
+  title,
+  content,
+  type = "basic",
+}) => {
+  const post = await Post.create({ creator, board, title, content, type });
 
   if (!post) {
     const errorMsg = "게시글 등록에 실패했습니다.";

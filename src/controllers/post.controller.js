@@ -8,7 +8,7 @@ const {
 const postController = require("express").Router();
 
 postController.post("/create", withAuth, async (req, res) => {
-  const { boardId, title, content } = req.body;
+  const { boardId, title, content, type } = req.body;
   const creator = req.userId;
 
   if (!title || !content) {
@@ -24,7 +24,7 @@ postController.post("/create", withAuth, async (req, res) => {
   }
 
   try {
-    const post = await createPost({ creator, boardId, title, content });
+    const post = await createPost({ creator, boardId, title, content, type });
 
     if (post.errorMsg !== null) {
       throw new Error(post.errorMsg);
