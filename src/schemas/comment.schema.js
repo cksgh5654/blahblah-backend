@@ -1,24 +1,24 @@
-const mongoose = require('../../mongodb_init');
-const { String, ObjectId } = mongoose.Schema.Types;
+const mongoose = require("../../mongodb_init");
+const { String, ObjectId, Date } = mongoose.Schema.Types;
 
 const commentSchema = new mongoose.Schema(
   {
     creator: {
       type: ObjectId,
       required: true,
-      ref: 'User',
+      ref: "User",
     },
     post: {
       type: ObjectId,
       required: true,
-      ref: 'Post',
+      ref: "Post",
     },
     content: {
       type: String,
       required: true,
     },
-    deleteAt: {
-      type: String,
+    deletedAt: {
+      type: Date,
       default: null,
     },
   },
@@ -30,5 +30,5 @@ const commentSchema = new mongoose.Schema(
   }
 );
 
-const Comment = mongoose.model('Comments', commentSchema);
+const Comment = mongoose.model("Comments", commentSchema);
 module.exports = Comment;
