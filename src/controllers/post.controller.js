@@ -66,9 +66,6 @@ postController.post("/update/:postId", withAuth, async (req, res) => {
   const { title, content } = req.body;
   const { postId } = req.params;
   const creator = req.userId;
-
-  console.log(title, content, postId, creator);
-
   if (!creator) {
     return res.status(401).json({
       isError: true,
@@ -107,7 +104,6 @@ postController.post("/update/:postId", withAuth, async (req, res) => {
 postController.get("/delete/:postId", withAuth, async (req, res) => {
   const { postId } = req.params;
   const creator = req.userId;
-  console.log(postId);
   if (!creator) {
     return res.status(401).json({
       isError: true,
