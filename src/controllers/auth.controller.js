@@ -146,17 +146,12 @@ authController.post("/signup/otp/verify", async (req, res) => {
         .json({ isError: false, message: "otp 정보가 잘못 되었습니다." });
     }
 
-    const { email, _id } = await createUser({
+    await createUser({
       email: tempUser.email,
       password: tempUser.password,
       nickname: tempUser.email.split("@")[0],
     });
-    const token = createToken({ email, userId: _id });
-    res.cookie("token", token, {
-      httpOnly: true,
-      maxAge: 1000 * 60 * 60,
-      path: "/",
-    });
+
     return res
       .status(201)
       .json({ isError: false, message: "회원가입에 성공 하였습니다." });
