@@ -1,3 +1,4 @@
+const Board = require("../schemas/board.schema");
 const Post = require("../schemas/post.schema");
 
 const createPost = async ({

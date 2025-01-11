@@ -6,6 +6,7 @@ const {
   getBoardsByCategoryName,
   getBoardById,
   getBoardByManagerId,
+  getBoardAndPostsByUrl,
 } = require("../services/board.service");
 const {
   updateBoardUser,
@@ -200,6 +201,20 @@ boardController.get("/:boardId/posts", withAuth, async (req, res) => {
         },
       },
     });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      isError: true,
+      message: "게시글 정보를 가져오는데 실패했습니다.",
+    });
+  }
+});
+
+boardController.get("/:boardUrl/board-post", async (req, res) => {
+  const { boardUrl } = req.params;
+  try {
+    const data = await getBoardAndPostsByUrl(boardUrl);
+    return res.status(200).json({ isError: false, data });
   } catch (error) {
     console.log(error);
     return res.status(500).json({
