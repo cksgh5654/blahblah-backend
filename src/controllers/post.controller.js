@@ -4,6 +4,8 @@ const {
   getPost,
   updatePost,
   deletePost,
+  getUserPostsCount,
+  getPostsByUserId,
 } = require('../services/post.service');
 const postController = require('express').Router();
 
@@ -66,7 +68,6 @@ postController.put('/update/:postId', withAuth, async (req, res) => {
   const { title, content } = req.body;
   const { postId } = req.params;
   const creator = req.userId;
-
   if (!creator) {
     return res.status(401).json({
       isError: true,
@@ -105,7 +106,6 @@ postController.put('/update/:postId', withAuth, async (req, res) => {
 postController.delete('/:postId', withAuth, async (req, res) => {
   const { postId } = req.params;
   const creator = req.userId;
-  console.log(postId);
   if (!creator) {
     return res.status(401).json({
       isError: true,
@@ -132,6 +132,40 @@ postController.delete('/:postId', withAuth, async (req, res) => {
   } catch (err) {
     console.error(`[post/:postId]: ${err}`);
     return res.status(500).json({ isError: true, message: `${err}` });
+  }
+});
+
+postController.get('/user/:userId', async (req, res) => {
+  const { userId } = req.params;
+  const page = Number(req.query.page) || 1;
+  const limit = Number(req.query.limit) || 20;
+  try {
+    const [posts, totalPostsCount] = await Promise.all([
+      getPostsByUserId(userId, { limit, page }),
+      getUserPostsCount(userId),
+    ]);
+    const totalPage = Math.ceil(totalPostsCount / limit);
+    const nextPage = page + 1 > totalPage ? totalPage : page + 1;
+    const prevPage = page - 1 === 0 ? page : page - 1;
+    return res.status(200).json({
+      isError: false,
+      data: {
+        posts,
+        pageInfo: {
+          currentPage: page,
+          nextPage,
+          prevPage,
+          totalPage,
+          totalPostsCount,
+        },
+      },
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      isError: true,
+      message: '게시글 정보를 가져오는데 실패했습니다.',
+    });
   }
 });
 

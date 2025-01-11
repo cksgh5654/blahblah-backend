@@ -1,3 +1,4 @@
+const Board = require("../schemas/board.schema");
 const Post = require("../schemas/post.schema");
 
 const createPost = async ({
@@ -80,10 +81,43 @@ const getPostByBoardId = async (boardId) => {
   }
 };
 
+const getBoardPostsCount = async (boardId) => {
+  try {
+    return await Post.find({ board: boardId }).countDocuments();
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
+const getPostsByUserId = async (userId, { limit = 20, page }) => {
+  const skip = (page - 1) * limit;
+  try {
+    const posts = Post.find({ creator: userId })
+      .populate("board")
+      .skip(skip)
+      .limit(limit)
+      .lean();
+    return posts;
+  } catch (error) {
+    throw new Error(`[DB 에러 getPostsByUserId]`, { cause: error });
+  }
+};
+
+const getUserPostsCount = async (userId) => {
+  try {
+    return await Post.find({ creator: userId }).countDocuments();
+  } catch (error) {
+    throw new Error(`[DB 에러 getUserPostsCount]`, { cause: error });
+  }
+};
+
 module.exports = {
   createPost,
   getPost,
   updatePost,
   deletePost,
   getPostByBoardId,
+  getBoardPostsCount,
+  getPostsByUserId,
+  getUserPostsCount,
 };
