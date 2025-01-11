@@ -6,12 +6,13 @@ const {
   getBoardsByCategoryName,
   getBoardById,
   getBoardByManagerId,
-  getBoardAndPostsByUrl,
+  getBoardDataByUrAndUserId,
 } = require("../services/board.service");
 const {
   updateBoardUser,
   getBoardUsersCount,
   getBoardUsersById,
+  createBoardUser,
 } = require("../services/BoardUser.service");
 const {
   getPostByBoardId,
@@ -210,17 +211,46 @@ boardController.get("/:boardId/posts", withAuth, async (req, res) => {
   }
 });
 
-boardController.get("/:boardUrl/board-post", async (req, res) => {
+boardController.get("/:boardUrl/board-post", withAuth, async (req, res) => {
   const { boardUrl } = req.params;
+  const token = req.cookies.token;
+  const userId = jwt.verify(token, config.jwt.secretKey).userId;
   try {
-    const data = await getBoardAndPostsByUrl(boardUrl);
-    return res.status(200).json({ isError: false, data });
+    const data = await getBoardDataByUrAndUserId({ boardUrl, userId });
+    return res
+      .status(200)
+      .json({
+        isError: false,
+        data,
+        userId,
+        isJoin: data.isJoin,
+        isApply: data.isApply,
+      });
   } catch (error) {
     console.log(error);
     return res.status(500).json({
       isError: true,
       message: "게시글 정보를 가져오는데 실패했습니다.",
     });
+  }
+});
+
+boardController.post("/createBoardUser", async (req, res) => {
+  const { board, user } = req.body;
+  try {
+    const createResult = await createBoardUser({ board, user });
+    if (createResult.isError) {
+      return res
+        .status(400)
+        .json({ isError: true, message: createResult.message });
+    }
+
+    return res
+      .status(201)
+      .json({ isError: false, message: createResult.message });
+  } catch (error) {
+    console.error(error);
+    return res.json({ isError: true, message: error.message });
   }
 });
 

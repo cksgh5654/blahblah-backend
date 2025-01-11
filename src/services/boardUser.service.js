@@ -46,8 +46,27 @@ const updateBoardUser = async (
   }
 };
 
+const createBoardUser = async (data) => {
+  try {
+    const existingUser = await BoardUser.findOne({
+      user: data.user,
+      board: data.board,
+    });
+    if (existingUser) {
+      return { isError: true, message: "이미 신청되었습니다." };
+    }
+
+    await BoardUser.create(data);
+    return { isError: false, message: "가입 신청 성공" };
+  } catch (err) {
+    console.log(`createBoardUser 에러 ${err}`);
+    return { isError: true, message: "가입 신청 실패" };
+  }
+};
+
 module.exports = {
   getBoardUsersById,
   getBoardUsersCount,
   updateBoardUser,
+  createBoardUser,
 };

@@ -1,4 +1,5 @@
 const Board = require("../schemas/board.schema");
+const BoardUser = require("../schemas/boardUser.schema");
 const Post = require("../schemas/post.schema");
 
 const createBoard = async (data) => {
@@ -55,9 +56,9 @@ const getBoardByManagerId = async (id) => {
   }
 };
 
-const getBoardAndPostsByUrl = async (boardUrl) => {
+const getBoardDataByUrAndUserId = async (data) => {
   try {
-    const board = await Board.findOne({ url: boardUrl }).populate(
+    const board = await Board.findOne({ url: data.boardUrl }).populate(
       "manager",
       "email nickname"
     );
@@ -65,11 +66,19 @@ const getBoardAndPostsByUrl = async (boardUrl) => {
       throw new Error("보드가 없습니다");
     }
 
+    const boardUser = await BoardUser.findOne({
+      user: data.userId,
+      board: board._id,
+    });
+
+    const isJoin = boardUser ? boardUser.joinedStatus : false;
+    const isApply = boardUser ? true : false;
+
     const posts = await Post.find({ board: board._id, deletedAt: null })
       .populate("creator")
       .lean();
 
-    return { board, posts };
+    return { board, posts, isJoin, isApply };
   } catch (error) {
     throw new Error(error.message);
   }
@@ -80,5 +89,5 @@ module.exports = {
   getBoardsByCategoryName,
   getBoardById,
   getBoardByManagerId,
-  getBoardAndPostsByUrl,
+  getBoardDataByUrAndUserId,
 };
