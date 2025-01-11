@@ -62,7 +62,7 @@ postController.get('/detail/:postId', withAuth, async (req, res) => {
   }
 });
 
-postController.post('/update/:postId', withAuth, async (req, res) => {
+postController.put('/update/:postId', withAuth, async (req, res) => {
   const { title, content } = req.body;
   const { postId } = req.params;
   const creator = req.userId;

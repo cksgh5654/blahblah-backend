@@ -45,7 +45,7 @@ const updatePost = async ({ postId: _id, title, content }) => {
 };
 
 const deletePost = async ({ postId: _id }) => {
-  const deletedDate = new Date('yyyy-mm-dd hh:mm:ss');
+  const deletedDate = new Date();
 
   const post = await Post.findOneAndUpdate(
     { _id },
