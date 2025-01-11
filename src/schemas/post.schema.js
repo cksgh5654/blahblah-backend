@@ -11,7 +11,7 @@ const postSchema = new mongoose.Schema(
     board: {
       type: ObjectId,
       required: true,
-      ref: 'Boards',
+      ref: 'boards',
     },
     title: {
       type: String,
@@ -39,5 +39,5 @@ const postSchema = new mongoose.Schema(
   }
 );
 
-const Post = mongoose.model('Posts', postSchema);
+const Post = mongoose.model('posts', postSchema);
 module.exports = Post;
