@@ -81,6 +81,28 @@ const getBoardPostsCount = async (boardId) => {
   }
 };
 
+const getPostsByUserId = async (userId, { limit = 20, page }) => {
+  const skip = (page - 1) * limit;
+  try {
+    const posts = Post.find({ creator: userId })
+      .populate("board")
+      .skip(skip)
+      .limit(limit)
+      .lean();
+    return posts;
+  } catch (error) {
+    throw new Error(`[DB 에러 getPostsByUserId]`, { cause: error });
+  }
+};
+
+const getUserPostsCount = async (userId) => {
+  try {
+    return await Post.find({ creator: userId }).countDocuments();
+  } catch (error) {
+    throw new Error(`[DB 에러 getUserPostsCount]`, { cause: error });
+  }
+};
+
 module.exports = {
   createPost,
   getPost,
@@ -88,4 +110,6 @@ module.exports = {
   deletePost,
   getPostByBoardId,
   getBoardPostsCount,
+  getPostsByUserId,
+  getUserPostsCount,
 };
