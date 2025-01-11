@@ -11,7 +11,7 @@ const postSchema = new mongoose.Schema(
     board: {
       type: ObjectId,
       required: true,
-      ref: "Boards",
+      ref: "boards",
     },
     title: {
       type: String,
