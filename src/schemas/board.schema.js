@@ -1,5 +1,5 @@
 const mongoose = require("../../mongodb_init");
-const { String, ObjectId } = mongoose.Schema.Types;
+const { String, ObjectId, Number, Date } = mongoose.Schema.Types;
 
 const boardSchema = new mongoose.Schema(
   {
@@ -8,7 +8,7 @@ const boardSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
-    content: {
+    description: {
       type: String,
       required: true,
     },
@@ -25,13 +25,21 @@ const boardSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    memberCount: {
+      type: Number,
+      required: true,
+    },
+    postCount: {
+      type: Number,
+      required: true,
+    },
     manager: {
       type: ObjectId,
       required: true,
-      ref: "User",
+      ref: "users",
     },
-    deleteAt: {
-      type: String,
+    deletedAt: {
+      type: Date,
       default: null,
     },
   },
@@ -43,5 +51,5 @@ const boardSchema = new mongoose.Schema(
   }
 );
 
-const Board = mongoose.model("Boards", boardSchema);
+const Board = mongoose.model("boards", boardSchema);
 module.exports = Board;

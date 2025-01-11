@@ -1,5 +1,5 @@
 const mongoose = require('../../mongodb_init');
-const { String, ObjectId } = mongoose.Schema.Types;
+const { String, ObjectId, Date } = mongoose.Schema.Types;
 
 const postSchema = new mongoose.Schema(
   {
@@ -22,8 +22,13 @@ const postSchema = new mongoose.Schema(
       required: true,
     },
     deletedAt: {
-      type: String,
+      type: Date,
       default: null,
+    },
+    type: {
+      type: String,
+      enum: ['basic', 'notification'],
+      default: 'basic',
     },
   },
   {

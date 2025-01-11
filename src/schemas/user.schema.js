@@ -1,5 +1,5 @@
-const mongoose = require('../../mongodb_init');
-const { String } = mongoose.Schema.Types;
+const mongoose = require("../../mongodb_init");
+const { String, Date } = mongoose.Schema.Types;
 
 const userSchema = new mongoose.Schema(
   {
@@ -16,10 +16,10 @@ const userSchema = new mongoose.Schema(
     },
     image: {
       type: String,
-      default: '',
+      default: "",
     },
     deleteAt: {
-      type: String,
+      type: Date,
       default: null,
     },
   },
@@ -31,5 +31,5 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-const User = mongoose.model('users', userSchema);
+const User = mongoose.model("users", userSchema);
 module.exports = User;
