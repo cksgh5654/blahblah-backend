@@ -1,4 +1,4 @@
-const mongoose = require("../../mongodb_init");
+const mongoose = require('../../mongodb_init');
 const { String, ObjectId, Date } = mongoose.Schema.Types;
 
 const postSchema = new mongoose.Schema(
@@ -6,12 +6,12 @@ const postSchema = new mongoose.Schema(
     creator: {
       type: ObjectId,
       required: true,
-      ref: "users",
+      ref: 'users',
     },
     board: {
       type: ObjectId,
       required: true,
-      ref: "boards",
+      ref: 'Boards',
     },
     title: {
       type: String,
@@ -27,8 +27,8 @@ const postSchema = new mongoose.Schema(
     },
     type: {
       type: String,
-      enum: ["basic", "notification"],
-      default: "basic",
+      enum: ['basic', 'notification'],
+      default: 'basic',
     },
   },
   {
@@ -39,5 +39,5 @@ const postSchema = new mongoose.Schema(
   }
 );
 
-const Post = mongoose.model("posts", postSchema);
+const Post = mongoose.model('Posts', postSchema);
 module.exports = Post;

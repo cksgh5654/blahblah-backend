@@ -1,4 +1,4 @@
-const mongoose = require("../../mongodb_init");
+const mongoose = require('../../mongodb_init');
 const { String, ObjectId, Date } = mongoose.Schema.Types;
 
 const commentSchema = new mongoose.Schema(
@@ -6,12 +6,12 @@ const commentSchema = new mongoose.Schema(
     creator: {
       type: ObjectId,
       required: true,
-      ref: "users",
+      ref: 'users',
     },
     post: {
       type: ObjectId,
       required: true,
-      ref: "posts",
+      ref: 'posts',
     },
     content: {
       type: String,
@@ -30,5 +30,5 @@ const commentSchema = new mongoose.Schema(
   }
 );
 
-const Comment = mongoose.model("Comments", commentSchema);
+const Comment = mongoose.model('comments', commentSchema);
 module.exports = Comment;
