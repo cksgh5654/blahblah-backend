@@ -72,8 +72,16 @@ boardController.get("/category/:name", async (req, res) => {
 
 boardController.get("/boardId/:boardId", withAuth, async (req, res) => {
   const { boardId } = req.params;
+
   try {
     const board = await getBoardById(boardId);
+    if (board.manager._id.toString() !== req.userId) {
+      return res.status(401).json({
+        isError: false,
+        message: "게시판 정보는 매니저만 접근 할 수 있습니다.",
+      });
+    }
+
     return res.status(200).json({ isError: false, board });
   } catch (error) {
     console.log(error);
@@ -217,15 +225,13 @@ boardController.get("/:boardUrl/board-post", withAuth, async (req, res) => {
   const userId = jwt.verify(token, config.jwt.secretKey).userId;
   try {
     const data = await getBoardDataByUrAndUserId({ boardUrl, userId });
-    return res
-      .status(200)
-      .json({
-        isError: false,
-        data,
-        userId,
-        isJoin: data.isJoin,
-        isApply: data.isApply,
-      });
+    return res.status(200).json({
+      isError: false,
+      data,
+      userId,
+      isJoin: data.isJoin,
+      isApply: data.isApply,
+    });
   } catch (error) {
     console.log(error);
     return res.status(500).json({
