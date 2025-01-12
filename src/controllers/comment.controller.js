@@ -4,6 +4,8 @@ const {
   getComments,
   updateComment,
   deleteComment,
+  getCommentsByUserId,
+  getUserCommentsCount,
 } = require("../services/comment.service");
 
 const commentController = require("express").Router();
