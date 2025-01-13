@@ -69,19 +69,25 @@ const getBoardDataByUrAndUserId = async (data) => {
       throw new Error("보드가 없습니다");
     }
 
-    const boardUser = await BoardUser.findOne({
-      user: data.userId,
-      board: board._id,
-    });
-
-    const isJoin = boardUser ? boardUser.joinedStatus : false;
-    const isApply = boardUser ? true : false;
-
     const posts = await Post.find({ board: board._id, deletedAt: null })
       .populate("creator")
       .lean();
 
-    return { board, posts, isJoin, isApply };
+    const memberCount = await BoardUser.countDocuments({ joinedStatus: true });
+
+    if (data.userId) {
+      const boardUser = await BoardUser.findOne({
+        user: data.userId,
+        board: board._id,
+      });
+
+      const isJoin = boardUser ? boardUser.joinedStatus : false;
+      const isApply = boardUser ? true : false;
+
+      return { board, posts, isJoin, isApply, memberCount };
+    }
+
+    return { board, posts, memberCount };
   } catch (error) {
     throw new Error(error.message);
   }

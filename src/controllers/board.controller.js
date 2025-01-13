@@ -64,13 +64,11 @@ boardController.get("/category/:name", async (req, res) => {
       return res.status(400).json({ isError: true, message: result.message });
     }
 
-    return res
-      .status(200)
-      .json({
-        isError: false,
-        data: result.data,
-        totalCount: result.totalCount,
-      });
+    return res.status(200).json({
+      isError: false,
+      data: result.data,
+      totalCount: result.totalCount,
+    });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ isError: true, message: error.message });
@@ -226,18 +224,16 @@ boardController.get("/:boardId/posts", withAuth, async (req, res) => {
   }
 });
 
-boardController.get("/:boardUrl/board-post", withAuth, async (req, res) => {
-  const { boardUrl } = req.params;
-  const token = req.cookies.token;
-  const userId = jwt.verify(token, config.jwt.secretKey).userId;
+boardController.get("/board-post", async (req, res) => {
+  const { boardUrl, userId } = req.query;
   try {
     const data = await getBoardDataByUrAndUserId({ boardUrl, userId });
     return res.status(200).json({
       isError: false,
       data,
-      userId,
       isJoin: data.isJoin,
       isApply: data.isApply,
+      memberCount: data.memberCount,
     });
   } catch (error) {
     console.log(error);
