@@ -67,6 +67,27 @@ const deleteComment = async ({ commentId: _id }) => {
   };
 };
 
+const matchOwner = async ({ commentId, creator }) => {
+  const comment = await Comment.findOne({ _id: commentId }).lean();
+
+  if (!comment) {
+    const errorMsg = '댓글 조회에 실패했습니다.';
+    return { errorMsg };
+  }
+
+  const isOwner = String(comment.creator) === creator;
+
+  if (!isOwner) {
+    const errorMsg = '해당 댓글의 수정 및 삭제 권한이 없습니다.';
+    return { errorMsg };
+  }
+
+  return {
+    isOwner,
+    errorMsg: null,
+  };
+};
+
 const getCommentsByUserId = async (userId, { limit = 20, page }) => {
   const skip = (page - 1) * limit;
   try {
@@ -100,6 +121,7 @@ module.exports = {
   getComments,
   updateComment,
   deleteComment,
+  matchOwner,
   getCommentsByUserId,
   getUserCommentsCount,
 };

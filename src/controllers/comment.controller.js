@@ -1,29 +1,37 @@
-const { withAuth } = require("../middleware/auth.middleware");
+const { withAuth } = require('../middleware/auth.middleware');
 const {
   createComment,
   getComments,
   updateComment,
   deleteComment,
+  matchOwner,
   getCommentsByUserId,
   getUserCommentsCount,
-} = require("../services/comment.service");
+} = require('../services/comment.service');
 
-const commentController = require("express").Router();
+const commentController = require('express').Router();
 
-commentController.post("/create", withAuth, async (req, res) => {
+commentController.post('/create', withAuth, async (req, res) => {
   const { postId, content } = req.body;
   const creator = req.userId;
+
+  if (!creator) {
+    return res.status(401).json({
+      isError: true,
+      message: '로그인 유지시간이 만료되었습니다. 다시 로그인해주세요.',
+    });
+  }
 
   if (!content) {
     return res
       .status(400)
-      .json({ isError: true, message: "댓글 내용을 입력해주세요." });
+      .json({ isError: true, message: '댓글 내용을 입력해주세요.' });
   }
 
   if (!postId) {
     return res
       .status(400)
-      .json({ isError: true, message: "등록된 게시글이 아닙니다." });
+      .json({ isError: true, message: '등록된 게시글이 아닙니다.' });
   }
 
   try {
@@ -35,21 +43,20 @@ commentController.post("/create", withAuth, async (req, res) => {
 
     return res
       .status(201)
-      .json({ isError: false, message: "댓글이 등록되었습니다." });
+      .json({ isError: false, message: '댓글이 등록되었습니다.' });
   } catch (err) {
     console.error(`[comment/create]: ${err}`);
     return res.status(500).json({ isError: true, message: `${err}` });
   }
 });
 
-commentController.post("/view", withAuth, async (req, res) => {
+commentController.post('/view', withAuth, async (req, res) => {
   const { postId } = req.body;
-  const creator = req.userId;
 
   if (!postId) {
     return res
       .status(400)
-      .json({ isError: true, message: "등록된 게시글이 아닙니다." });
+      .json({ isError: true, message: '등록된 게시글이 아닙니다.' });
   }
 
   try {
@@ -68,7 +75,7 @@ commentController.post("/view", withAuth, async (req, res) => {
   }
 });
 
-commentController.put("/update/:commentId", withAuth, async (req, res) => {
+commentController.put('/update/:commentId', withAuth, async (req, res) => {
   const { commentId } = req.params;
   const { content } = req.body;
   const creator = req.userId;
@@ -76,66 +83,82 @@ commentController.put("/update/:commentId", withAuth, async (req, res) => {
   if (!creator) {
     return res.status(401).json({
       isError: true,
-      message: "로그인 유지시간이 만료되었습니다. 다시 로그인해주세요.",
+      message: '로그인 유지시간이 만료되었습니다. 다시 로그인해주세요.',
     });
   }
 
   if (!commentId) {
     return res
       .status(400)
-      .json({ isError: true, message: "댓글 정보가 없습니다." });
+      .json({ isError: true, message: '댓글 정보가 없습니다.' });
   }
 
   try {
-    const commentData = await updateComment({ commentId, content });
+    const isOwnerData = await matchOwner({ commentId, creator });
 
-    if (commentData.errorMsg !== null) {
-      throw new Error(post.errorMsg);
+    if (isOwnerData.errorMsg !== null) {
+      res.status(500).json({ isError: true, message: isOwnerData.errorMsg });
     }
 
-    return res
-      .status(200)
-      .json({ isError: false, message: "댓글이 수정되었습니다." });
+    if (isOwnerData.isOwner) {
+      const commentData = await updateComment({ commentId, content });
+
+      if (commentData.errorMsg !== null) {
+        res.status(500).json({ isError: true, message: isOwnerData.errorMsg });
+      }
+
+      return res
+        .status(200)
+        .json({ isError: false, message: '댓글이 수정되었습니다.' });
+    }
   } catch (err) {
     console.error(`[comment/update/:commentId]: ${err}`);
     return res.status(500).json({ isError: true, message: `${err}` });
   }
 });
 
-commentController.delete("/:commentId", withAuth, async (req, res) => {
+commentController.delete('/:commentId', withAuth, async (req, res) => {
   const { commentId } = req.params;
   const creator = req.userId;
 
   if (!creator) {
     return res.status(401).json({
       isError: true,
-      message: "로그인 유지시간이 만료되었습니다. 다시 로그인해주세요.",
+      message: '로그인 유지시간이 만료되었습니다. 다시 로그인해주세요.',
     });
   }
 
   if (!commentId) {
     return res
       .status(400)
-      .json({ isError: true, message: "댓글 정보가 없습니다." });
+      .json({ isError: true, message: '댓글 정보가 없습니다.' });
   }
 
   try {
-    const commentData = await deleteComment({ commentId });
+    const isOwnerData = await matchOwner({ commentId, creator });
 
-    if (commentData.errorMsg !== null) {
-      throw new Error(post.errorMsg);
+    if (isOwnerData.errorMsg !== null) {
+      res.status(500).json({ isError: true, message: isOwnerData.errorMsg });
     }
 
-    return res
-      .status(200)
-      .json({ isError: false, message: "댓글이 삭제되었습니다." });
+    if (isOwnerData.isOwner) {
+      const commentData = await deleteComment({ commentId });
+
+      if (commentData.errorMsg !== null) {
+        throw new Error(post.errorMsg);
+      }
+
+      return res
+        .status(200)
+        .json({ isError: false, message: '댓글이 삭제되었습니다.' });
+    }
   } catch (err) {
     console.error(`[comment/:commentId]: ${err}`);
     return res.status(500).json({ isError: true, message: `${err}` });
   }
 });
 
-commentController.get("/user/:userId", async (req, res) => {
+commentController.get('/user/:userId', async (req, res) => {
   const { userId } = req.params;
   const page = Number(req.query.page) || 1;
   const limit = Number(req.query.limit) || 20;
@@ -164,7 +187,39 @@ commentController.get("/user/:userId", async (req, res) => {
     console.log(error);
     return res
       .status(500)
-      .json({ isError: true, message: "댓글 정보 가져오는데 실패했습니다." });
+      .json({ isError: true, message: '댓글 정보 가져오는데 실패했습니다.' });
+  }
+});
+
+commentController.get('/checkuser/:commentId', withAuth, async (req, res) => {
+  const { commentId } = req.params;
+  const creator = req.userId;
+  if (!creator) {
+    return res.status(401).json({
+      isError: true,
+      message: '로그인 유지시간이 만료되었습니다. 다시 로그인해주세요.',
+    });
+  }
+
+  if (!commentId) {
+    return res
+      .status(400)
+      .json({ isError: true, message: '게시글 정보가 없습니다.' });
+  }
+
+  try {
+    const isOwnerData = await matchOwner({ commentId, creator });
+
+    if (isOwnerData.errorMsg !== null) {
+      res.status(500).json({ isError: true, message: isOwnerData.errorMsg });
+    }
+
+    if (isOwnerData.isOwner) {
+      return res.status(200).json({ isError: false, message: '작성자입나다.' });
+    }
+  } catch (err) {
+    console.error(`[comment/checkuser/:commentId]: ${err}`);
+    return res.status(500).json({ isError: true, message: `${err}` });
   }
 });
 
