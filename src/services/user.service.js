@@ -46,9 +46,32 @@ const updateUserById = async (id, { email, nickname, image, password }) => {
   }
 };
 
+const getUsers = async ({ page, limit }) => {
+  const skip = (page - 1) * limit;
+  try {
+    const users = await User.find({ role: "USER" }) //
+      .skip(skip)
+      .limit(limit)
+      .lean();
+    return users;
+  } catch (error) {
+    throw new Error(`[DB에러] getUsers`, { cause: error });
+  }
+};
+
+const getTotalUsersCount = async () => {
+  try {
+    return await User.countDocuments();
+  } catch (error) {
+    throw new Error(`[DB에러] getTotalUsersCount`, { cause: error });
+  }
+};
+
 module.exports = {
   createUser,
   findUserByEmail,
   findUserByNickname,
   updateUserById,
+  getUsers,
+  getTotalUsersCount,
 };
