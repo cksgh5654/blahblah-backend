@@ -173,6 +173,16 @@ const getTotalBoardCount = async () => {
   }
 };
 
+const deleteBoard = async (boardId) => {
+  try {
+    const board = await Board.findOneAndUpdate(
+      { _id: boardId },
+      { deletedAt: Date.now() }
+    );
+    return board;
+  } catch (error) {}
+};
+
 module.exports = {
   createBoard,
   getBoardsByCategoryName,
@@ -181,4 +191,5 @@ module.exports = {
   getBoardDataByUrAndUserId,
   getBoard,
   getTotalBoardCount,
+  deleteBoard,
 };

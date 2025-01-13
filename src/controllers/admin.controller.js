@@ -1,4 +1,8 @@
-const { getBoard, getTotalBoardCount } = require("../services/board.service");
+const {
+  getBoard,
+  getTotalBoardCount,
+  deleteBoard,
+} = require("../services/board.service");
 const { getUsers, getTotalUsersCount } = require("../services/user.service");
 
 const adminController = require("express").Router();
@@ -68,6 +72,22 @@ adminController.get("/users", async (req, res) => {
       isError: true,
       message: "유저 데이터를 가져오는데 실패했습니다.",
     });
+  }
+});
+
+adminController.delete("/board/:boardId", async (req, res) => {
+  const { boardId } = req.params;
+  try {
+    const board = await deleteBoard(boardId);
+    console.log(board);
+    return res
+      .status(200)
+      .json({ isError: false, message: "게시판을 삭제 하였습니다." });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .json({ isError: true, message: "게시판 삭제를 실패하였습니다." });
   }
 });
 
