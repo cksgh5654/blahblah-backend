@@ -151,10 +151,34 @@ const getBoardDataByUrAndUserId = async (data) => {
   }
 };
 
+const getBoard = async ({ page, limit }) => {
+  const skip = (page - 1) * limit;
+  try {
+    const board = await Board.find() //
+      .populate("manager")
+      .skip(skip)
+      .limit(limit)
+      .lean();
+    return board;
+  } catch (error) {
+    throw new Error(`[DB 에러] getBoard`, { cause: error });
+  }
+};
+
+const getTotalBoardCount = async () => {
+  try {
+    return await Board.countDocuments();
+  } catch (error) {
+    throw new Error(`[DB 에러] getTotalBoardCount`, { cause: error });
+  }
+};
+
 module.exports = {
   createBoard,
   getBoardsByCategoryName,
   getBoardById,
   getBoardByManagerId,
   getBoardDataByUrAndUserId,
+  getBoard,
+  getTotalBoardCount,
 };
