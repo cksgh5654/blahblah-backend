@@ -18,6 +18,11 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    role: {
+      type: String,
+      enum: ["USER", "ADMIN"],
+      default: "USER",
+    },
     deleteAt: {
       type: Date,
       default: null,
