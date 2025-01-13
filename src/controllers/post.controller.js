@@ -4,13 +4,14 @@ const {
   getPost,
   updatePost,
   deletePost,
+  getBoardId,
   getUserPostsCount,
   getPostsByUserId,
 } = require('../services/post.service');
 const postController = require('express').Router();
 
 postController.post('/create', withAuth, async (req, res) => {
-  const { boardId, title, content, type } = req.body;
+  const { url, title, content, type } = req.body;
   const creator = req.userId;
 
   if (!title || !content) {
@@ -19,13 +20,14 @@ postController.post('/create', withAuth, async (req, res) => {
       .json({ isError: true, message: '모든 필드를 입력해주세요.' });
   }
 
-  if (!boardId) {
-    return res
-      .status(400)
-      .json({ isError: true, message: '등록된 게시판이 아닙니다.' });
-  }
-
   try {
+    const boardData = await getBoardId({ url });
+
+    if (boardData.errorMsg !== null) {
+      throw new Error(boardData.errorMsg);
+    }
+
+    const boardId = boardData.board;
     const post = await createPost({ creator, boardId, title, content, type });
 
     if (post.errorMsg !== null) {
