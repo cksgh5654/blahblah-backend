@@ -1,4 +1,3 @@
-const Board = require('../schemas/board.schema');
 const Post = require('../schemas/post.schema');
 const Comment = require('../schemas/comment.schema');
 
@@ -20,23 +19,6 @@ const createPost = async ({
     post: post.toObject(),
     errorMsg: null,
   };
-};
-
-const getBoardId = async ({ url }) => {
-  try {
-    const board = await Board.findOne({ url }).lean();
-
-    if (!board) {
-      const errorMsg = '등록된 게시판이 아닙니다.';
-      return { errorMsg };
-    }
-    return {
-      board,
-      errorMsg: null,
-    };
-  } catch (error) {
-    throw new Error(`[DB Error] getBoardById`, { cause: error });
-  }
 };
 
 const getPost = async ({ postId: _id }) => {
@@ -101,6 +83,27 @@ const deletePost = async ({ postId: _id }) => {
   };
 };
 
+const matchOwner = async ({ postId, creator }) => {
+  const post = await Post.findOne({ _id: postId }).lean();
+
+  if (!post) {
+    const errorMsg = '게시글을 조회에 실패했습니다.';
+    return { errorMsg };
+  }
+
+  const isOwner = String(post.creator) === creator;
+
+  if (!isOwner) {
+    const errorMsg = '해당 게시글의 수정 및 삭제 권한이 없습니다.';
+    return { errorMsg };
+  }
+
+  return {
+    isOwner,
+    errorMsg: null,
+  };
+};
+
 const getPostByBoardId = async (boardId) => {
   try {
     const posts = await Post.find({ board: boardId, deletedAt: null }) //
@@ -147,7 +150,7 @@ module.exports = {
   getPost,
   updatePost,
   deletePost,
-  getBoardId,
+  matchOwner,
   getPostByBoardId,
   getBoardPostsCount,
   getPostsByUserId,
