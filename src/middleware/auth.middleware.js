@@ -18,6 +18,7 @@ const withAuth = async (req, res, next) => {
     }
     req.userId = userId;
     req.email = email;
+    req.role = user.role;
     next();
   } catch (error) {
     console.log(error);
@@ -40,6 +41,19 @@ const withAuth = async (req, res, next) => {
   }
 };
 
+const onlyAdmin = async (req, res, next) => {
+  const role = req.role;
+
+  if (role !== "ADMIN") {
+    return res
+      .status(401)
+      .json({ isError: true, message: "접근 권한이 부족합니다." });
+  }
+
+  next();
+};
+
 module.exports = {
   withAuth,
+  onlyAdmin,
 };
