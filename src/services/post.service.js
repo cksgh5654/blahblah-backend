@@ -22,9 +22,27 @@ const createPost = async ({
   };
 };
 
+const getBoardId = async ({ url }) => {
+  try {
+    const board = await Board.findOne({ url }).lean();
+
+    if (!board) {
+      const errorMsg = '등록된 게시판이 아닙니다.';
+      return { errorMsg };
+    }
+    return {
+      board,
+      errorMsg: null,
+    };
+  } catch (error) {
+    throw new Error(`[DB Error] getBoardById`, { cause: error });
+  }
+};
+
 const getPost = async ({ postId: _id }) => {
   const post = await Post.findOne({ _id })
     .populate('creator', 'image nickname')
+    .populate('board', 'url')
     .lean();
 
   if (!post) {
@@ -129,6 +147,7 @@ module.exports = {
   getPost,
   updatePost,
   deletePost,
+  getBoardId,
   getPostByBoardId,
   getBoardPostsCount,
   getPostsByUserId,
