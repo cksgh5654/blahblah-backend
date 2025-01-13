@@ -154,7 +154,7 @@ const getBoardDataByUrAndUserId = async (data) => {
 const getBoard = async ({ page, limit }) => {
   const skip = (page - 1) * limit;
   try {
-    const board = await Board.find() //
+    const board = await Board.find({ deletedAt: null }) //
       .populate("manager")
       .skip(skip)
       .limit(limit)
