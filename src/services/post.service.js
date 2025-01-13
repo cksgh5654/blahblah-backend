@@ -1,5 +1,6 @@
 const Board = require('../schemas/board.schema');
 const Post = require('../schemas/post.schema');
+const Comment = require('../schemas/comment.schema');
 
 const createPost = async ({
   creator,
