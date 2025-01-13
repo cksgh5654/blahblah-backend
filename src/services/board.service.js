@@ -195,7 +195,7 @@ const getBoard = async ({ page, limit }) => {
 
 const getTotalBoardCount = async () => {
   try {
-    return await Board.countDocuments();
+    return await Board.find({ deletedAt: null }).countDocuments();
   } catch (error) {
     throw new Error(`[DB 에러] getTotalBoardCount`, { cause: error });
   }

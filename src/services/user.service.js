@@ -61,7 +61,7 @@ const getUsers = async ({ page, limit }) => {
 
 const getTotalUsersCount = async () => {
   try {
-    return await User.countDocuments();
+    return await User.find({ role: "USER", deletedAt: null }).countDocuments();
   } catch (error) {
     throw new Error(`[DB에러] getTotalUsersCount`, { cause: error });
   }
