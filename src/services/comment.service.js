@@ -24,8 +24,12 @@ const getComments = async ({ postId }) => {
     return { errorMsg };
   }
 
+  const NonDeletedcomments = comments.filter(
+    ({ deletedAt }) => deletedAt === null
+  );
+
   return {
-    comments,
+    comments: NonDeletedcomments,
     errorMsg: null,
   };
 };
