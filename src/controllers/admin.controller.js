@@ -3,7 +3,11 @@ const {
   getTotalBoardCount,
   deleteBoard,
 } = require("../services/board.service");
-const { getUsers, getTotalUsersCount } = require("../services/user.service");
+const {
+  getUsers,
+  getTotalUsersCount,
+  deleteUser,
+} = require("../services/user.service");
 
 const adminController = require("express").Router();
 
@@ -78,8 +82,7 @@ adminController.get("/users", async (req, res) => {
 adminController.delete("/board/:boardId", async (req, res) => {
   const { boardId } = req.params;
   try {
-    const board = await deleteBoard(boardId);
-    console.log(board);
+    await deleteBoard(boardId);
     return res
       .status(200)
       .json({ isError: false, message: "게시판을 삭제 하였습니다." });
@@ -88,6 +91,22 @@ adminController.delete("/board/:boardId", async (req, res) => {
     return res
       .status(500)
       .json({ isError: true, message: "게시판 삭제를 실패하였습니다." });
+  }
+});
+
+adminController.delete("/users/:userId", async (req, res) => {
+  const { userId } = req.params;
+  try {
+    await deleteUser(userId);
+    return res
+      .status(200)
+      .json({ isError: false, message: "유저 정보를 삭제하였습니다." });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      isError: true,
+      message: "유저 정보를 삭제하는데 실패하였습니다.",
+    });
   }
 });
 

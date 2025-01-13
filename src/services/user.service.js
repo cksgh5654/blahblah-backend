@@ -49,7 +49,7 @@ const updateUserById = async (id, { email, nickname, image, password }) => {
 const getUsers = async ({ page, limit }) => {
   const skip = (page - 1) * limit;
   try {
-    const users = await User.find({ role: "USER" }) //
+    const users = await User.find({ role: "USER", deletedAt: null }) //
       .skip(skip)
       .limit(limit)
       .lean();
@@ -67,6 +67,18 @@ const getTotalUsersCount = async () => {
   }
 };
 
+const deleteUser = async (userId) => {
+  try {
+    const user = await User.findOneAndUpdate(
+      { _id: userId },
+      { deletedAt: Date.now() }
+    );
+    return user;
+  } catch (error) {
+    throw new Error(`[DB에러 deleteUser]`, { cause: error });
+  }
+};
+
 module.exports = {
   createUser,
   findUserByEmail,
@@ -74,4 +86,5 @@ module.exports = {
   updateUserById,
   getUsers,
   getTotalUsersCount,
+  deleteUser,
 };
