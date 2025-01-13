@@ -1,10 +1,10 @@
-const Comment = require("../schemas/comment.schema");
+const Comment = require('../schemas/comment.schema');
 
 const createComment = async ({ postId, creator, content }) => {
   const comment = await Comment.create({ post: postId, creator, content });
 
   if (!comment) {
-    const errorMsg = "댓글 등록에 실패했습니다.";
+    const errorMsg = '댓글 등록에 실패했습니다.';
     return { errorMsg };
   }
 
@@ -16,16 +16,20 @@ const createComment = async ({ postId, creator, content }) => {
 
 const getComments = async ({ postId }) => {
   const comments = await Comment.find({ post: postId })
-    .populate("creator", "image nickname")
+    .populate('creator', 'image nickname')
     .lean();
 
   if (!comments) {
-    const errorMsg = "댓글 조회에 실패했습니다.";
+    const errorMsg = '댓글 조회에 실패했습니다.';
     return { errorMsg };
   }
 
+  const NonDeletedcomments = comments.filter(
+    ({ deletedAt }) => deletedAt === null
+  );
+
   return {
-    comments,
+    comments: NonDeletedcomments,
     errorMsg: null,
   };
 };
@@ -34,7 +38,7 @@ const updateComment = async ({ commentId: _id, content }) => {
   const comment = await Comment.findByIdAndUpdate({ _id }, { content }).lean();
 
   if (!comment) {
-    const errorMsg = "댓글 수정에 실패했습니다.";
+    const errorMsg = '댓글 수정에 실패했습니다.';
     return { errorMsg };
   }
 
@@ -53,7 +57,7 @@ const deleteComment = async ({ commentId: _id }) => {
   ).lean();
 
   if (!comment) {
-    const errorMsg = "댓글 삭제에 실패했습니다.";
+    const errorMsg = '댓글 삭제에 실패했습니다.';
     return { errorMsg };
   }
 
@@ -68,10 +72,10 @@ const getCommentsByUserId = async (userId, { limit = 20, page }) => {
   try {
     const posts = Comment.find({ creator: userId })
       .populate({
-        path: "post",
+        path: 'post',
         populate: {
-          path: "board",
-          select: "image",
+          path: 'board',
+          select: 'image',
         },
       })
       .skip(skip)
