@@ -226,15 +226,22 @@ boardController.get('/:boardId/posts', withAuth, async (req, res) => {
 });
 
 boardController.get('/board-post', async (req, res) => {
-  const { boardUrl, userId } = req.query;
+  const { boardUrl, userId, page, limit } = req.query;
   try {
-    const data = await getBoardDataByUrAndUserId({ boardUrl, userId });
+    const data = await getBoardDataByUrAndUserId({
+      boardUrl,
+      userId,
+      page,
+      limit,
+    });
     return res.status(200).json({
       isError: false,
-      data,
+      board: data.board,
+      basicPosts: data.basicPosts,
+      notificationPosts: data.notificationPosts,
       isJoin: data.isJoin,
       isApply: data.isApply,
-      memberCount: data.memberCount,
+      totalPostCount: data.totalPostCount,
     });
   } catch (error) {
     console.log(error);

@@ -25,12 +25,23 @@ const createBoard = async (data) => {
 const getBoardsByCategoryName = async (name, page, limit) => {
   try {
     const skip = page * limit;
-    const boards = await Board.find({ category: name })
+    const boardsInCategory = await Board.find({ category: name })
       .skip(skip)
       .limit(limit)
       .populate('manager', 'email nickname');
 
     const totalCount = await Board.countDocuments({ category: name });
+
+    const boards = await Promise.all(
+      boardsInCategory.map(async (board) => {
+        const memberCount = await BoardUser.countDocuments({
+          joinedStatus: true,
+          board: board._id,
+        });
+        board.memberCount = memberCount;
+        return board;
+      })
+    );
 
     return { isError: false, data: boards, totalCount };
   } catch (err) {
@@ -61,7 +72,9 @@ const getBoardByManagerId = async (id) => {
 
 const getBoardDataByUrAndUserId = async (data) => {
   try {
-    const board = await Board.findOne({ url: data.boardUrl }).populate(
+    const { boardUrl, userId, page, limit } = data;
+    const skip = page * limit;
+    const board = await Board.findOne({ url: boardUrl }).populate(
       'manager',
       'email nickname'
     );
@@ -69,25 +82,70 @@ const getBoardDataByUrAndUserId = async (data) => {
       throw new Error('보드가 없습니다');
     }
 
-    const posts = await Post.find({ board: board._id, deletedAt: null })
+    const basicPosts = await Post.find({
+      board: board._id,
+      deletedAt: null,
+      type: 'basic',
+    })
+      .skip(skip)
+      .limit(limit)
       .populate('creator')
       .lean();
 
-    const memberCount = await BoardUser.countDocuments({ joinedStatus: true });
+    const notificationPosts = await Post.find({
+      board: board._id,
+      deletedAt: null,
+      type: 'notification',
+    })
+      .skip(skip)
+      .limit(limit)
+      .populate('creator')
+      .lean();
 
-    if (data.userId) {
+    const totalPostCount = {
+      basic: 0,
+      notification: 0,
+    };
+
+    totalPostCount.basic = await Post.countDocuments({
+      board: board._id,
+      deletedAt: null,
+      type: 'basic',
+    });
+
+    totalPostCount.notification = await Post.countDocuments({
+      board: board._id,
+      deletedAt: null,
+      type: 'notification',
+    });
+
+    const memberCount = await BoardUser.countDocuments({
+      board: board._id,
+      joinedStatus: true,
+    });
+
+    board.memberCount = memberCount;
+
+    if (userId) {
       const boardUser = await BoardUser.findOne({
-        user: data.userId,
+        user: userId,
         board: board._id,
       });
 
       const isJoin = boardUser ? boardUser.joinedStatus : false;
       const isApply = boardUser ? true : false;
 
-      return { board, posts, isJoin, isApply, memberCount };
+      return {
+        board,
+        basicPosts,
+        notificationPosts,
+        totalPostCount,
+        isJoin,
+        isApply,
+      };
     }
 
-    return { board, posts, memberCount };
+    return { board, basicPosts, notificationPosts, totalPostCount };
   } catch (error) {
     throw new Error(error.message);
   }
@@ -110,6 +168,38 @@ const getBoardId = async ({ url }) => {
   }
 };
 
+const getBoard = async ({ page, limit }) => {
+  const skip = (page - 1) * limit;
+  try {
+    const board = await Board.find({ deletedAt: null }) //
+      .populate('manager')
+      .skip(skip)
+      .limit(limit)
+      .lean();
+    return board;
+  } catch (error) {
+    throw new Error(`[DB 에러] getBoard`, { cause: error });
+  }
+};
+
+const getTotalBoardCount = async () => {
+  try {
+    return await Board.countDocuments();
+  } catch (error) {
+    throw new Error(`[DB 에러] getTotalBoardCount`, { cause: error });
+  }
+};
+
+const deleteBoard = async (boardId) => {
+  try {
+    const board = await Board.findOneAndUpdate(
+      { _id: boardId },
+      { deletedAt: Date.now() }
+    );
+    return board;
+  } catch (error) {}
+};
+
 module.exports = {
   createBoard,
   getBoardsByCategoryName,
@@ -117,4 +207,7 @@ module.exports = {
   getBoardByManagerId,
   getBoardDataByUrAndUserId,
   getBoardId,
+  getBoard,
+  getTotalBoardCount,
+  deleteBoard,
 };

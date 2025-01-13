@@ -18,7 +18,12 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
-    deleteAt: {
+    role: {
+      type: String,
+      enum: ["USER", "ADMIN"],
+      default: "USER",
+    },
+    deletedAt: {
       type: Date,
       default: null,
     },

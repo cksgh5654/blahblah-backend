@@ -1,5 +1,5 @@
 const mongoose = require("../../mongodb_init");
-const { String, ObjectId, Date } = mongoose.Schema.Types;
+const { String, ObjectId, Number, Date } = mongoose.Schema.Types;
 
 const boardSchema = new mongoose.Schema(
   {
@@ -23,6 +23,10 @@ const boardSchema = new mongoose.Schema(
     },
     category: {
       type: String,
+      required: true,
+    },
+    memberCount: {
+      type: Number,
       required: true,
     },
     manager: {
