@@ -11,7 +11,7 @@ const {
 const { getBoardId } = require('../services/board.service');
 const postController = require('express').Router();
 
-postController.post('/create', withAuth, async (req, res) => {
+postController.post('/', withAuth, async (req, res) => {
   const { url, title, content, type } = req.body;
   const creator = req.userId;
 
@@ -114,7 +114,7 @@ postController.get('/checkuser/:postId', withAuth, async (req, res) => {
   }
 });
 
-postController.put('/update/:postId', withAuth, async (req, res) => {
+postController.put('/:postId', withAuth, async (req, res) => {
   const { title, content } = req.body;
   const { postId } = req.params;
   const creator = req.userId;

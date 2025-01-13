@@ -11,7 +11,7 @@ const {
 
 const commentController = require('express').Router();
 
-commentController.post('/create', withAuth, async (req, res) => {
+commentController.post('/', withAuth, async (req, res) => {
   const { postId, content } = req.body;
   const creator = req.userId;
 
@@ -75,7 +75,7 @@ commentController.post('/view', withAuth, async (req, res) => {
   }
 });
 
-commentController.put('/update/:commentId', withAuth, async (req, res) => {
+commentController.put('/:commentId', withAuth, async (req, res) => {
   const { commentId } = req.params;
   const { content } = req.body;
   const creator = req.userId;
