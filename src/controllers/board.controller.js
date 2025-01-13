@@ -55,15 +55,22 @@ boardController.post("/submit", withAuth, async (req, res) => {
 
 boardController.get("/category/:name", async (req, res) => {
   const { name } = req.params;
+  const { page, limit } = req.query;
 
   try {
-    const result = await getBoardsByCategoryName(name);
+    const result = await getBoardsByCategoryName(name, page, limit);
 
     if (result.isError) {
       return res.status(400).json({ isError: true, message: result.message });
     }
 
-    return res.status(200).json({ isError: false, data: result.data });
+    return res
+      .status(200)
+      .json({
+        isError: false,
+        data: result.data,
+        totalCount: result.totalCount,
+      });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ isError: true, message: error.message });
