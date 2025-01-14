@@ -9,6 +9,7 @@ const {
   getBoardDataByUrAndUserId,
   getBoardByName,
   getBoardId,
+  getAllBoardsByCatogoryName,
 } = require("../services/board.service");
 const {
   updateBoardUser,
@@ -313,6 +314,28 @@ boardController.get("/board-name", async (req, res) => {
     }
 
     return res.status(200).json({ isError: false, boards });
+  } catch (error) {
+    console.error(error);
+    return res.json({ isError: true, message: error.message });
+  }
+});
+
+boardController.get("/boards/category-name", async (req, res) => {
+  const { categoryName, page, limit } = req.query;
+  try {
+    const boards = await getAllBoardsByCatogoryName(categoryName, page, limit);
+
+    if (!boards) {
+      return res
+        .status(200)
+        .json({ isError: false, message: "게시판이 없습니다." });
+    }
+
+    return res.status(200).json({
+      isError: false,
+      boards: boards.boards,
+      totalBoardCount: boards.totalBoardCount,
+    });
   } catch (error) {
     console.error(error);
     return res.json({ isError: true, message: error.message });
