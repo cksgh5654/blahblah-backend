@@ -15,7 +15,7 @@ const {
   getBoardUsersCount,
   getBoardUsersById,
   createBoardUser,
-} = require("../services/BoardUser.service");
+} = require("../services/boardUser.service");
 const {
   getPostByBoardId,
   getBoardPostsCount,
