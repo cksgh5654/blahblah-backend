@@ -156,15 +156,11 @@ const getBoardId = async ({ url }) => {
     const board = await Board.findOne({ url }).lean();
 
     if (!board) {
-      const errorMsg = '등록된 게시판이 아닙니다.';
-      return { errorMsg };
+      throw new Error('등록된 게시판이 아닙니다.');
     }
-    return {
-      board,
-      errorMsg: null,
-    };
+    return board;
   } catch (error) {
-    throw new Error(`[DB Error] getBoardById`, { cause: error });
+    throw error;
   }
 };
 

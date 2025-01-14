@@ -1,5 +1,6 @@
 const Post = require('../schemas/post.schema');
 const Comment = require('../schemas/comment.schema');
+const { default: mongoose } = require('mongoose');
 
 const createPost = async ({
   creator,
@@ -8,100 +9,99 @@ const createPost = async ({
   content,
   type = 'basic',
 }) => {
-  const post = await Post.create({ creator, board, title, content, type });
-
-  if (!post) {
-    const errorMsg = '게시글 등록에 실패했습니다.';
-    return { errorMsg };
+  try {
+    const post = await Post.create({ creator, board, title, content, type });
+    if (!post) {
+      throw new Error('게시글 등록에 실패했습니다.');
+    }
+    return post.toObject();
+  } catch (err) {
+    throw err;
   }
-
-  return {
-    post: post.toObject(),
-    errorMsg: null,
-  };
 };
 
 const getPost = async ({ postId: _id }) => {
-  const post = await Post.findOne({ _id })
-    .populate('creator', 'image nickname')
-    .populate('board', 'url')
-    .lean();
+  try {
+    const post = await Post.findOne({ _id })
+      .populate('creator', 'image nickname')
+      .populate('board', 'url')
+      .lean();
 
-  if (!post) {
-    const errorMsg = '게시글 조회에 실패했습니다.';
-    return { errorMsg };
+    if (!post) {
+      throw new Error('게시글 조회에 실패했습니다.');
+    }
+
+    const NonDeletedPost = post.deletedAt === null ? post : null;
+    return NonDeletedPost;
+  } catch (err) {
+    if (err instanceof mongoose.Error.CastError) {
+      throw new Error('게시글 조회에 실패했습니다.');
+    }
+    throw err;
   }
-
-  const NonDeletedPost = post.deletedAt === null ? post : null;
-
-  return {
-    post: NonDeletedPost,
-    errorMsg: null,
-  };
 };
 
 const updatePost = async ({ postId: _id, title, content }) => {
-  const post = await Post.findByIdAndUpdate({ _id }, { title, content }).lean();
-
-  if (!post) {
-    const errorMsg = '게시글을 수정에 실패했습니다.';
-    return { errorMsg };
+  try {
+    const post = await Post.findByIdAndUpdate(
+      { _id },
+      { title, content }
+    ).lean();
+    if (!post) {
+      throw new Error('게시글 수정에 실패했습니다.');
+    }
+    return post;
+  } catch (err) {
+    if (err instanceof mongoose.Error.CastError) {
+      throw new Error('게시글 수정에 실패했습니다.');
+    }
+    throw err;
   }
-
-  return {
-    post,
-    errorMsg: null,
-  };
 };
 
 const deletePost = async ({ postId: _id }) => {
   const deletedDate = new Date();
-
-  const post = await Post.findOneAndUpdate(
-    { _id },
-    { deletedAt: deletedDate }
-  ).lean();
-
-  if (!post) {
-    const errorMsg = '게시글 삭제에 실패했습니다.';
-    return { errorMsg };
+  try {
+    const post = await Post.findOneAndUpdate(
+      { _id },
+      { deletedAt: deletedDate }
+    ).lean();
+    if (!post) {
+      throw new Error('게시글 삭제에 실패했습니다.');
+    }
+    const deletedComments = await Comment.updateMany(
+      { post: _id },
+      { deletedAt: deletedDate }
+    );
+    if (!deletedComments) {
+      throw new Error('해당 게시글의 댓글들 삭제에 실패했습니다.');
+    }
+    return post;
+  } catch (err) {
+    if (err instanceof mongoose.Error.CastError) {
+      throw new Error('게시글 삭제에 실패했습니다.');
+    }
+    throw err;
   }
-
-  const deletedComments = await Comment.updateMany(
-    { post: _id },
-    { deletedAt: deletedDate }
-  );
-
-  if (!deletedComments) {
-    const errorMsg = '해당 게시글의 댓글들 삭제에 실패했습니다.';
-    return { errorMsg };
-  }
-
-  return {
-    post,
-    errorMsg: null,
-  };
 };
 
 const matchOwner = async ({ postId, creator }) => {
-  const post = await Post.findOne({ _id: postId }).lean();
-
-  if (!post) {
-    const errorMsg = '게시글을 조회에 실패했습니다.';
-    return { errorMsg };
+  try {
+    const post = await Post.findOne({ _id: postId }).lean();
+    if (!post) {
+      throw new Error('게시글 조회에 실패했습니다.');
+    }
+    const isOwner = String(post.creator) === creator;
+    if (!isOwner) {
+      throw new Error('해당 게시글의 수정 및 삭제 권한이 없습니다.');
+    }
+    return isOwner;
+  } catch (err) {
+    if (err instanceof mongoose.Error.CastError) {
+      throw new Error('게시글 조회에 실패했습니다.');
+    }
+    throw err;
   }
-
-  const isOwner = String(post.creator) === creator;
-
-  if (!isOwner) {
-    const errorMsg = '해당 게시글의 수정 및 삭제 권한이 없습니다.';
-    return { errorMsg };
-  }
-
-  return {
-    isOwner,
-    errorMsg: null,
-  };
 };
 
 const getPostByBoardId = async (boardId) => {

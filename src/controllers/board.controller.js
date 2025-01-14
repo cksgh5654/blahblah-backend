@@ -271,7 +271,7 @@ boardController.post('/createBoardUser', async (req, res) => {
   }
 });
 
-boardController.get('/board/:url', withAuth, async (req, res) => {
+boardController.get('/board-url/:url', withAuth, async (req, res) => {
   const { url } = req.params;
   const creator = req.userId;
 
@@ -283,20 +283,13 @@ boardController.get('/board/:url', withAuth, async (req, res) => {
   }
 
   try {
-    const boardData = await getBoardId({ url });
-
-    if (boardData.errorMsg !== null) {
-      throw new Error(boardData.errorMsg);
-    }
-
-    if (boardData.board) {
-      return res
-        .status(200)
-        .json({ isError: false, message: '게시판 조회 성공' });
+    const board = await getBoardId({ url });
+    if (board) {
+      return res.status(200).json({ isError: false });
     }
   } catch (err) {
-    console.error(`[board/:url]: ${err}`);
-    return res.status(500).json({ isError: true, message: `${err}` });
+    console.error(`[/board-url/:url]`, err.message);
+    return res.status(500).json({ isError: true, message: err.message });
   }
 });
 
