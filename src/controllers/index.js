@@ -7,6 +7,7 @@ const categoryController = require("./category.controller");
 const commentController = require("./comment.controller");
 const adminController = require("./admin.controller");
 const { withAuth, onlyAdmin } = require("../middleware/auth.middleware");
+const imageController = require("./image.controller");
 
 apiController.use("/auth", authController);
 apiController.use("/user", userController);
@@ -15,5 +16,6 @@ apiController.use("/board", boardController);
 apiController.use("/category", categoryController);
 apiController.use("/comment", commentController);
 apiController.use("/admin", withAuth, onlyAdmin, adminController);
+apiController.use("/image", withAuth, imageController);
 
 module.exports = apiController;
