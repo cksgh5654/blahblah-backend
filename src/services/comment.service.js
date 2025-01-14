@@ -1,4 +1,5 @@
 const Comment = require('../schemas/comment.schema');
+const { default: mongoose } = require('mongoose');
 
 const createComment = async ({ postId, creator, content }) => {
   try {
