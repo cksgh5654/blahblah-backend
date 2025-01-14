@@ -25,12 +25,18 @@ const createBoard = async (data) => {
 const getBoardsByCategoryName = async (name, page, limit) => {
   try {
     const skip = page * limit;
-    const boardsInCategory = await Board.find({ category: name })
+    const boardsInCategory = await Board.find({
+      category: name,
+      deletedAt: null,
+    })
       .skip(skip)
       .limit(limit)
       .populate('manager', 'email nickname');
 
-    const totalCount = await Board.countDocuments({ category: name });
+    const totalCount = await Board.countDocuments({
+      category: name,
+      deletedAt: null,
+    });
 
     const boards = await Promise.all(
       boardsInCategory.map(async (board) => {
@@ -150,6 +156,17 @@ const getBoardDataByUrAndUserId = async (data) => {
     throw new Error(error.message);
   }
 };
+const getBoardByName = async (name) => {
+  try {
+    const boards = await Board.find(
+      { name: { $regex: name, $options: 'i' }, deletedAt: null },
+      { name: 1, url: 1 }
+    );
+    return { boards };
+  } catch (err) {
+    throw new Error(err.message);
+  }
+};
 
 const getBoardId = async ({ url }) => {
   try {
@@ -180,7 +197,7 @@ const getBoard = async ({ page, limit }) => {
 
 const getTotalBoardCount = async () => {
   try {
-    return await Board.countDocuments();
+    return await Board.find({ deletedAt: null }).countDocuments();
   } catch (error) {
     throw new Error(`[DB 에러] getTotalBoardCount`, { cause: error });
   }
@@ -196,14 +213,34 @@ const deleteBoard = async (boardId) => {
   } catch (error) {}
 };
 
+const getAllBoardsByCatogoryName = async (name, page, limit) => {
+  try {
+    const skip = page * limit;
+    const boards = await Board.find({ category: name, deletedAt: null })
+      .skip(skip)
+      .limit(limit);
+
+    const totalBoardCount = await Board.countDocuments({
+      category: name,
+      deletedAt: null,
+    });
+    return { boards, totalBoardCount };
+  } catch (err) {
+    console.log(`getAllBoardsByCatogoryName 에러 ${err}`);
+    return { isError: true, message: '게시판 가져오기 실패' };
+  }
+};
+
 module.exports = {
   createBoard,
   getBoardsByCategoryName,
   getBoardById,
   getBoardByManagerId,
   getBoardDataByUrAndUserId,
+  getBoardByName,
   getBoardId,
   getBoard,
   getTotalBoardCount,
   deleteBoard,
+  getAllBoardsByCatogoryName,
 };

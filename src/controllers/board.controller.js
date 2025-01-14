@@ -7,14 +7,16 @@ const {
   getBoardById,
   getBoardByManagerId,
   getBoardDataByUrAndUserId,
+  getBoardByName,
   getBoardId,
+  getAllBoardsByCatogoryName,
 } = require('../services/board.service');
 const {
   updateBoardUser,
   getBoardUsersCount,
   getBoardUsersById,
   createBoardUser,
-} = require('../services/BoardUser.service');
+} = require('../services/boardUser.service');
 const {
   getPostByBoardId,
   getBoardPostsCount,
@@ -290,6 +292,46 @@ boardController.get('/board-url/:url', withAuth, async (req, res) => {
   } catch (err) {
     console.error(`[/board-url/:url]`, err.message);
     return res.status(500).json({ isError: true, message: err.message });
+  }
+});
+
+boardController.get('/board-name', async (req, res) => {
+  const { boardName } = req.query;
+  try {
+    const boards = await getBoardByName(boardName);
+
+    if (!boards) {
+      return res
+        .status(200)
+        .json({ isError: false, message: '게시판이 없습니다.' });
+    }
+
+    return res.status(200).json({ isError: false, boards });
+  } catch (error) {
+    console.error(error);
+    return res.json({ isError: true, message: error.message });
+  }
+});
+
+boardController.get('/boards/category-name', async (req, res) => {
+  const { categoryName, page, limit } = req.query;
+  try {
+    const boards = await getAllBoardsByCatogoryName(categoryName, page, limit);
+
+    if (!boards) {
+      return res
+        .status(200)
+        .json({ isError: false, message: '게시판이 없습니다.' });
+    }
+
+    return res.status(200).json({
+      isError: false,
+      boards: boards.boards,
+      totalBoardCount: boards.totalBoardCount,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.json({ isError: true, message: error.message });
   }
 });
 

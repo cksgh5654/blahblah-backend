@@ -22,6 +22,14 @@ const config = {
     authEmail: process.env.NODEMAILER_AUTH_EMAIL,
     authPass: process.env.NODEMAILER_AUTH_PASS,
   },
+  aws: {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    region: process.env.AWS_REGION,
+    s3: {
+      bucketName: process.env.BUCKET_NAME,
+    },
+  },
 };
 
 module.exports = config;
