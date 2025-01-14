@@ -1,91 +1,95 @@
 const Comment = require('../schemas/comment.schema');
+const { default: mongoose } = require('mongoose');
 
 const createComment = async ({ postId, creator, content }) => {
-  const comment = await Comment.create({ post: postId, creator, content });
-
-  if (!comment) {
-    const errorMsg = '댓글 등록에 실패했습니다.';
-    return { errorMsg };
+  try {
+    const comment = await Comment.create({ post: postId, creator, content });
+    if (!comment) {
+      throw new Error('댓글 등록에 실패했습니다.');
+    }
+    return comment.toObject();
+  } catch (err) {
+    if (err instanceof mongoose.Error.CastError) {
+      throw new Error('댓글 등록에 실패했습니다.');
+    }
+    throw err;
   }
-
-  return {
-    comment: comment.toObject(),
-    errorMsg: null,
-  };
 };
 
 const getComments = async ({ postId }) => {
-  const comments = await Comment.find({ post: postId })
-    .populate('creator', 'image nickname')
-    .lean();
-
-  if (!comments) {
-    const errorMsg = '댓글 조회에 실패했습니다.';
-    return { errorMsg };
+  try {
+    const comments = await Comment.find({ post: postId })
+      .populate('creator', 'image nickname')
+      .lean();
+    if (!comments) {
+      throw new Error('댓글 조회에 실패했습니다.');
+    }
+    const NonDeletedcomments = comments.filter(
+      ({ deletedAt }) => deletedAt === null
+    );
+    return NonDeletedcomments;
+  } catch {
+    if (err instanceof mongoose.Error.CastError) {
+      throw new Error('댓글 등록에 실패했습니다.');
+    }
+    throw err;
   }
-
-  const NonDeletedcomments = comments.filter(
-    ({ deletedAt }) => deletedAt === null
-  );
-
-  return {
-    comments: NonDeletedcomments,
-    errorMsg: null,
-  };
 };
 
 const updateComment = async ({ commentId: _id, content }) => {
-  const comment = await Comment.findByIdAndUpdate({ _id }, { content }).lean();
-
-  if (!comment) {
-    const errorMsg = '댓글 수정에 실패했습니다.';
-    return { errorMsg };
+  try {
+    const comment = await Comment.findByIdAndUpdate(
+      { _id },
+      { content }
+    ).lean();
+    if (!comment) {
+      throw new Error('댓글 수정에 실패했습니다.');
+    }
+    return comment;
+  } catch (err) {
+    if (err instanceof mongoose.Error.CastError) {
+      throw new Error('댓글 수정에 실패했습니다.');
+    }
+    throw err;
   }
-
-  return {
-    comment,
-    errorMsg: null,
-  };
 };
 
 const deleteComment = async ({ commentId: _id }) => {
   const deletedDate = new Date();
-
-  const comment = await Comment.findOneAndUpdate(
-    { _id },
-    { deletedAt: deletedDate }
-  ).lean();
-
-  if (!comment) {
-    const errorMsg = '댓글 삭제에 실패했습니다.';
-    return { errorMsg };
+  try {
+    const comment = await Comment.findOneAndUpdate(
+      { _id },
+      { deletedAt: deletedDate }
+    ).lean();
+    if (!comment) {
+      throw new Error('댓글 삭제에 실패했습니다.');
+    }
+    return comment;
+  } catch (err) {
+    if (err instanceof mongoose.Error.CastError) {
+      throw new Error('댓글 삭제에 실패했습니다.');
+    }
+    throw err;
   }
-
-  return {
-    comment,
-    errorMsg: null,
-  };
 };
 
 const matchOwner = async ({ commentId, creator }) => {
-  const comment = await Comment.findOne({ _id: commentId }).lean();
-
-  if (!comment) {
-    const errorMsg = '댓글 조회에 실패했습니다.';
-    return { errorMsg };
+  try {
+    const comment = await Comment.findOne({ _id: commentId }).lean();
+    if (!comment) {
+      throw new Error('댓글 조회에 실패했습니다.');
+    }
+    const isOwner = String(comment.creator) === creator;
+    if (!isOwner) {
+      throw new Error('해당 댓글의 수정 및 삭제 권한이 없습니다.');
+    }
+    return isOwner;
+  } catch (err) {
+    if (err instanceof mongoose.Error.CastError) {
+      throw new Error('댓글 조회에 실패했습니다.');
+    }
+    throw err;
   }
-
-  const isOwner = String(comment.creator) === creator;
-
-  if (!isOwner) {
-    const errorMsg = '해당 댓글의 수정 및 삭제 권한이 없습니다.';
-    return { errorMsg };
-  }
-
-  return {
-    isOwner,
-    errorMsg: null,
-  };
 };
 
 const getCommentsByUserId = async (userId, { limit = 20, page }) => {
