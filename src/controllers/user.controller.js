@@ -26,7 +26,7 @@ userController.get("/profile", async (req, res) => {
   try {
     const { email } = req.query;
     const user = await findUserByEmail(email);
-    if (!user) {
+    if (!user || user.deletedAt !== null) {
       return res
         .status(404)
         .json({ isError: true, message: "잘못된 유저 정보 요청입니다." });
