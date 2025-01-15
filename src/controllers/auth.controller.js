@@ -86,6 +86,11 @@ authController.post("/signup/otp", async (req, res) => {
 
   try {
     const user = await findUserByEmail(email);
+    if (user.deletedAt !== null) {
+      return res
+        .status(400)
+        .json({ isError: false, message: "이미 탈퇴한 계정 입니다." });
+    }
     if (user) {
       return res
         .status(400)
@@ -189,6 +194,11 @@ authController.post("/signin/email", async (req, res) => {
         .status(404)
         .json({ isError: true, message: "잘못된 정보 요청 입니다." });
     }
+    if (user.deletedAt !== null) {
+      return res
+        .status(400)
+        .json({ isError: true, message: "이미 탈퇴한 계정 입니다." });
+    }
     const hashedPassword = createHashedPassword(password);
     const { password: pwFromDB, _id, ...rest } = user;
     if (hashedPassword !== pwFromDB) {
@@ -220,6 +230,11 @@ authController.post("/password-reset/otp", async (req, res) => {
 
   try {
     const user = await findUserByEmail(email);
+    if (user.deletedAt !== null) {
+      return res
+        .status(400)
+        .json({ isError: true, message: "이미 탈퇴한 계정 입니다." });
+    }
     if (!user) {
       return res
         .status(404)
