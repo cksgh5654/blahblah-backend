@@ -339,15 +339,21 @@ boardController.get("/boards/category-name", async (req, res) => {
 boardController.get("/boards/board-name", async (req, res) => {
   const { boardName, page, limit } = req.query;
   try {
-    const result = await getAllBoardsByName(boardName, page, limit);
-    if (result.isError) {
-      return res.status(400).json({ isError: true, message: result.message });
+    const boards = await getAllBoardsByName(boardName, page, limit);
+    if (boards.isError) {
+      return res.status(400).json({ isError: true, message: boards.message });
+    }
+
+    if (!boards) {
+      return res
+        .status(400)
+        .json({ isError: false, message: "게시판이 없습니다." });
     }
 
     return res.status(200).json({
       isError: false,
-      data: result.data,
-      totalCount: result.totalCount,
+      data: boards.data,
+      totalCount: boards.totalCount,
     });
   } catch (error) {
     console.error(error);

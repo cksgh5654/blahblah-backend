@@ -26,6 +26,7 @@ const getBoardsByCategoryName = async (name, page, limit) => {
   try {
     const skip = page * limit;
     const boardsInCategory = await Board.find({
+      approvalStatus: "승인",
       category: name,
       deletedAt: null,
     })
@@ -35,6 +36,7 @@ const getBoardsByCategoryName = async (name, page, limit) => {
       .populate("manager", "email nickname");
 
     const totalCount = await Board.countDocuments({
+      approvalStatus: "승인",
       category: name,
       deletedAt: null,
     });
@@ -160,7 +162,11 @@ const getBoardDataByUrAndUserId = async (data) => {
 const getBoardByName = async (name) => {
   try {
     const boards = await Board.find(
-      { name: { $regex: name, $options: "i" }, deletedAt: null },
+      {
+        name: { $regex: name, $options: "i" },
+        deletedAt: null,
+        approvalStatus: "승인",
+      },
       { name: 1, url: 1 }
     );
     return { boards };
@@ -224,7 +230,11 @@ const deleteBoard = async (boardId) => {
 const getAllBoardsByCatogoryName = async (name, page, limit) => {
   try {
     const skip = page * limit;
-    const boards = await Board.find({ category: name, deletedAt: null })
+    const boards = await Board.find({
+      category: name,
+      deletedAt: null,
+      approvalStatus: "승인",
+    })
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
@@ -232,6 +242,7 @@ const getAllBoardsByCatogoryName = async (name, page, limit) => {
     const totalBoardCount = await Board.countDocuments({
       category: name,
       deletedAt: null,
+      approvalStatus: "승인",
     });
     return { boards, totalBoardCount };
   } catch (err) {
@@ -246,6 +257,7 @@ const getAllBoardsByName = async (name, page, limit) => {
     const boardsInSearch = await Board.find({
       name: { $regex: name, $options: "i" },
       deletedAt: null,
+      approvalStatus: "승인",
     })
       .skip(skip)
       .limit(limit)
@@ -254,6 +266,7 @@ const getAllBoardsByName = async (name, page, limit) => {
     const totalCount = await Board.countDocuments({
       name: { $regex: name, $options: "i" },
       deletedAt: null,
+      approvalStatus: "승인",
     });
 
     const boards = await Promise.all(
