@@ -228,8 +228,12 @@ boardController.get("/:boardId/posts", withAuth, async (req, res) => {
   }
 });
 
-boardController.get("/board-post", async (req, res) => {
-  const { boardUrl, userId, page, limit } = req.query;
+boardController.get("/board-post", withAuth, async (req, res) => {
+  const { boardUrl, page, limit } = req.query;
+  const token = req.cookies.token;
+  const decoded = jwt.verify(token, config.jwt.secretKey);
+  const userId = decoded.userId;
+
   try {
     const data = await getBoardDataByUrAndUserId({
       boardUrl,
@@ -245,6 +249,7 @@ boardController.get("/board-post", async (req, res) => {
       isJoin: data.isJoin,
       isApply: data.isApply,
       totalPostCount: data.totalPostCount,
+      userId: userId,
     });
   } catch (error) {
     console.log(error);

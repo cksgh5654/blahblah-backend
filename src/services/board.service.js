@@ -159,6 +159,7 @@ const getBoardDataByUrAndUserId = async (data) => {
     throw new Error(error.message);
   }
 };
+
 const getBoardByName = async (name) => {
   try {
     const boards = await Board.find(
