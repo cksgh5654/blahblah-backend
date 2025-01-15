@@ -1,10 +1,10 @@
-const Comment = require('../schemas/comment.schema');
+const Comment = require("../schemas/comment.schema");
 
 const createComment = async ({ postId, creator, content }) => {
   const comment = await Comment.create({ post: postId, creator, content });
 
   if (!comment) {
-    const errorMsg = '댓글 등록에 실패했습니다.';
+    const errorMsg = "댓글 등록에 실패했습니다.";
     return { errorMsg };
   }
 
@@ -16,11 +16,11 @@ const createComment = async ({ postId, creator, content }) => {
 
 const getComments = async ({ postId }) => {
   const comments = await Comment.find({ post: postId })
-    .populate('creator', 'image nickname')
+    .populate("creator", "image nickname")
     .lean();
 
   if (!comments) {
-    const errorMsg = '댓글 조회에 실패했습니다.';
+    const errorMsg = "댓글 조회에 실패했습니다.";
     return { errorMsg };
   }
 
@@ -38,7 +38,7 @@ const updateComment = async ({ commentId: _id, content }) => {
   const comment = await Comment.findByIdAndUpdate({ _id }, { content }).lean();
 
   if (!comment) {
-    const errorMsg = '댓글 수정에 실패했습니다.';
+    const errorMsg = "댓글 수정에 실패했습니다.";
     return { errorMsg };
   }
 
@@ -57,7 +57,7 @@ const deleteComment = async ({ commentId: _id }) => {
   ).lean();
 
   if (!comment) {
-    const errorMsg = '댓글 삭제에 실패했습니다.';
+    const errorMsg = "댓글 삭제에 실패했습니다.";
     return { errorMsg };
   }
 
@@ -71,14 +71,14 @@ const matchOwner = async ({ commentId, creator }) => {
   const comment = await Comment.findOne({ _id: commentId }).lean();
 
   if (!comment) {
-    const errorMsg = '댓글 조회에 실패했습니다.';
+    const errorMsg = "댓글 조회에 실패했습니다.";
     return { errorMsg };
   }
 
   const isOwner = String(comment.creator) === creator;
 
   if (!isOwner) {
-    const errorMsg = '해당 댓글의 수정 및 삭제 권한이 없습니다.';
+    const errorMsg = "해당 댓글의 수정 및 삭제 권한이 없습니다.";
     return { errorMsg };
   }
 
@@ -91,12 +91,12 @@ const matchOwner = async ({ commentId, creator }) => {
 const getCommentsByUserId = async (userId, { limit = 20, page }) => {
   const skip = (page - 1) * limit;
   try {
-    const posts = Comment.find({ creator: userId })
+    const posts = Comment.find({ creator: userId, deletedAt: null })
       .populate({
-        path: 'post',
+        path: "post",
         populate: {
-          path: 'board',
-          select: 'image',
+          path: "board",
+          select: "image",
         },
       })
       .skip(skip)
@@ -110,7 +110,10 @@ const getCommentsByUserId = async (userId, { limit = 20, page }) => {
 
 const getUserCommentsCount = async (userId) => {
   try {
-    return await Comment.find({ creator: userId }).countDocuments();
+    return await Comment.find({
+      creator: userId,
+      deletedAt: null,
+    }).countDocuments();
   } catch (error) {
     throw new Error(`[DB 에러 getUserCommentsCount]`, { cause: error });
   }
