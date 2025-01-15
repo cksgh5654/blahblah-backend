@@ -2,6 +2,7 @@ const {
   getBoard,
   getTotalBoardCount,
   deleteBoard,
+  updateBoardStatus,
 } = require("../services/board.service");
 const {
   getUsers,
@@ -106,6 +107,34 @@ adminController.delete("/users/:userId", async (req, res) => {
     return res.status(500).json({
       isError: true,
       message: "유저 정보를 삭제하는데 실패하였습니다.",
+    });
+  }
+});
+
+adminController.put("/board/:boardId", async (req, res) => {
+  const { boardId } = req.params;
+  const { status } = req.body;
+  if (!boardId) {
+    return res
+      .status(400)
+      .json({ isError: true, message: "게시판 아이디가 필요합니다." });
+  }
+  if (!status) {
+    return res
+      .status(400)
+      .json({ isError: true, message: "게시판 상태가 필요합니다." });
+  }
+  try {
+    await updateBoardStatus(boardId, status);
+    return res.status(200).json({
+      isError: false,
+      message: "게시판 상태 업데이트에 성공 하였습니다.",
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      isError: true,
+      message: "게시판 상태 업데이트에 실패 하였습니다.",
     });
   }
 });
