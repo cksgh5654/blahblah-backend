@@ -29,6 +29,7 @@ const getBoardsByCategoryName = async (name, page, limit) => {
       category: name,
       deletedAt: null,
     })
+      .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
       .populate('manager', 'email nickname');
@@ -217,6 +218,7 @@ const getAllBoardsByCatogoryName = async (name, page, limit) => {
   try {
     const skip = page * limit;
     const boards = await Board.find({ category: name, deletedAt: null })
+      .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
 
@@ -228,6 +230,40 @@ const getAllBoardsByCatogoryName = async (name, page, limit) => {
   } catch (err) {
     console.log(`getAllBoardsByCatogoryName 에러 ${err}`);
     return { isError: true, message: '게시판 가져오기 실패' };
+  }
+};
+
+const getAllBoardsByName = async (name, page, limit) => {
+  try {
+    const skip = page * limit;
+    const boardsInSearch = await Board.find({
+      name: { $regex: name, $options: "i" },
+      deletedAt: null,
+    })
+      .skip(skip)
+      .limit(limit)
+      .populate("manager", "email nickname");
+
+    const totalCount = await Board.countDocuments({
+      name: { $regex: name, $options: "i" },
+      deletedAt: null,
+    });
+
+    const boards = await Promise.all(
+      boardsInSearch.map(async (board) => {
+        const memberCount = await BoardUser.countDocuments({
+          joinedStatus: true,
+          board: board._id,
+        });
+        board.memberCount = memberCount;
+        return board;
+      })
+    );
+
+    return { isError: false, data: boards, totalCount };
+  } catch (err) {
+    console.log(`getBoardsByCategoryName 에러 ${err}`);
+    return { isError: true, message: "게시판 가져오기 실패" };
   }
 };
 
@@ -243,4 +279,5 @@ module.exports = {
   getTotalBoardCount,
   deleteBoard,
   getAllBoardsByCatogoryName,
+  getAllBoardsByName,
 };
