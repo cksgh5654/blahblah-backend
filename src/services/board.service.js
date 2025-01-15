@@ -70,7 +70,7 @@ const getBoardById = async (id) => {
 
 const getBoardByManagerId = async (id) => {
   try {
-    const board = await Board.find({ manager: id }).lean();
+    const board = await Board.find({ manager: id, deletedAt: null }).lean();
     return board;
   } catch (error) {
     throw new Error(`[DB Error] getBoardByManagerId`, { cause: error });
