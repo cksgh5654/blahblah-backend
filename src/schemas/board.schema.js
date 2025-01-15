@@ -38,6 +38,12 @@ const boardSchema = new mongoose.Schema(
       type: Date,
       default: null,
     },
+    approvalStatus: {
+      type: String,
+      required: true,
+      enum: ["대기", "승인", "미승인"],
+      default: "대기",
+    },
   },
   {
     timestamps: {
