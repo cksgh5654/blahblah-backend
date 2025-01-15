@@ -45,6 +45,12 @@ authController.get("/google-oauth-redirect", async (req, res) => {
     if (request.data) {
       const { email, picture: image } = request.data;
       let user = await findUserByEmail(email);
+      if (user.deletedAt !== null) {
+        return res.redirect(
+          `${config.app.frontEndPoint}/signin?errorMessage=이미탈퇴한사용자입니다.`
+        );
+      }
+
       if (!user) {
         const nickname = email.split("@")[0];
         user = await createUser({ email, nickname, image });
