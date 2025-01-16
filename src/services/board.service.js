@@ -79,9 +79,32 @@ const getBoardByManagerId = async (id) => {
   }
 };
 
-const getBoardDataByUrAndUserId = async (data) => {
+const getBoardUserInfo = async (data) => {
   try {
-    const { boardUrl, userId, page, limit } = data;
+    const { userId, boardUrl } = data;
+
+    const board = await Board.findOne({ url: boardUrl });
+
+    const boardUser = await BoardUser.findOne({
+      user: userId,
+      board: board._id,
+    });
+
+    const isJoin = boardUser ? boardUser.joinedStatus : false;
+    const isApply = boardUser ? true : false;
+
+    return {
+      isJoin,
+      isApply,
+    };
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
+
+const getBoardDataByUrl = async (data) => {
+  try {
+    const { boardUrl, page, limit } = data;
     const skip = page * limit;
     const board = await Board.findOne({ url: boardUrl }).populate(
       "manager",
@@ -134,25 +157,6 @@ const getBoardDataByUrAndUserId = async (data) => {
     });
 
     board.memberCount = memberCount;
-
-    if (userId) {
-      const boardUser = await BoardUser.findOne({
-        user: userId,
-        board: board._id,
-      });
-
-      const isJoin = boardUser ? boardUser.joinedStatus : false;
-      const isApply = boardUser ? true : false;
-
-      return {
-        board,
-        basicPosts,
-        notificationPosts,
-        totalPostCount,
-        isJoin,
-        isApply,
-      };
-    }
 
     return { board, basicPosts, notificationPosts, totalPostCount };
   } catch (error) {
@@ -309,7 +313,8 @@ module.exports = {
   getBoardsByCategoryName,
   getBoardById,
   getBoardByManagerId,
-  getBoardDataByUrAndUserId,
+  getBoardUserInfo,
+  getBoardDataByUrl,
   getBoardByName,
   getBoardId,
   getBoard,

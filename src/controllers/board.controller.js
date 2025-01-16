@@ -11,6 +11,8 @@ const {
   getBoardId,
   getAllBoardsByCatogoryName,
   getAllBoardsByName,
+  getBoardDataByUrl,
+  getBoardUserInfo,
 } = require("../services/board.service");
 const {
   updateBoardUser,
@@ -228,16 +230,38 @@ boardController.get("/:boardId/posts", withAuth, async (req, res) => {
   }
 });
 
-boardController.get("/board-post", withAuth, async (req, res) => {
-  const { boardUrl, page, limit } = req.query;
+boardController.get("/user-info", withAuth, async (req, res) => {
+  const { boardUrl } = req.query;
   const token = req.cookies.token;
   const decoded = jwt.verify(token, config.jwt.secretKey);
   const userId = decoded.userId;
 
   try {
-    const data = await getBoardDataByUrAndUserId({
-      boardUrl,
+    const data = await getBoardUserInfo({
       userId,
+      boardUrl,
+    });
+    return res.status(200).json({
+      isError: false,
+      isJoin: data.isJoin,
+      isApply: data.isApply,
+      userId: userId,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      isError: true,
+      message: "게시판 유저 정보를 가져오는데 실패했습니다.",
+    });
+  }
+});
+
+boardController.get("/board-user", async (req, res) => {
+  const { boardUrl, page, limit } = req.query;
+
+  try {
+    const data = await getBoardDataByUrl({
+      boardUrl,
       page,
       limit,
     });
@@ -246,12 +270,15 @@ boardController.get("/board-post", withAuth, async (req, res) => {
       board: data.board,
       basicPosts: data.basicPosts,
       notificationPosts: data.notificationPosts,
-      isJoin: data.isJoin,
-      isApply: data.isApply,
       totalPostCount: data.totalPostCount,
-      userId: userId,
     });
   } catch (error) {
+    if (error.message === "보드가 없습니다") {
+      return res.status(404).json({
+        isError: true,
+        message: "보드가 없습니다.",
+      });
+    }
     console.log(error);
     return res.status(500).json({
       isError: true,
