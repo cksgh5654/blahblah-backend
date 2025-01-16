@@ -45,16 +45,18 @@ authController.get("/google-oauth-redirect", async (req, res) => {
     if (request.data) {
       const { email, picture: image } = request.data;
       let user = await findUserByEmail(email);
-      if (user.deletedAt !== null) {
-        return res.redirect(
-          `${config.app.frontEndPoint}/signin?errorMessage=이미탈퇴한사용자입니다.`
-        );
-      }
 
       if (!user) {
         const nickname = email.split("@")[0];
         user = await createUser({ email, nickname, image });
+      } else {
+        if (user.deletedAt !== null) {
+          return res.redirect(
+            `${config.app.frontEndPoint}/signin?errorMessage=이미탈퇴한사용자입니다.`
+          );
+        }
       }
+
       const token = createToken({ email, userId: user._id });
       res.cookie("token", token, {
         maxAge: 60 * 1000 * 1000,
@@ -86,12 +88,14 @@ authController.post("/signup/otp", async (req, res) => {
 
   try {
     const user = await findUserByEmail(email);
-    if (user.deletedAt !== null) {
-      return res
-        .status(400)
-        .json({ isError: false, message: "이미 탈퇴한 계정 입니다." });
-    }
+
     if (user) {
+      if (user.deletedAt !== null) {
+        return res
+          .status(400)
+          .json({ isError: false, message: "이미 탈퇴한 계정 입니다." });
+      }
+
       return res
         .status(400)
         .json({ isError: true, message: "이미 가입된 이메일 계정 입니다." });
@@ -193,12 +197,14 @@ authController.post("/signin/email", async (req, res) => {
       return res
         .status(404)
         .json({ isError: true, message: "잘못된 정보 요청 입니다." });
+    } else {
+      if (user.deletedAt !== null) {
+        return res
+          .status(400)
+          .json({ isError: true, message: "이미 탈퇴한 계정 입니다." });
+      }
     }
-    if (user.deletedAt !== null) {
-      return res
-        .status(400)
-        .json({ isError: true, message: "이미 탈퇴한 계정 입니다." });
-    }
+
     const hashedPassword = createHashedPassword(password);
     const { password: pwFromDB, _id, ...rest } = user;
     if (hashedPassword !== pwFromDB) {
