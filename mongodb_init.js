@@ -1,9 +1,8 @@
 const mongoose = require("mongoose");
-
-const { MONGO_DB_URL, MONGO_DB_NAME } = require("./consts/index");
+const config = require("./consts");
 
 mongoose
-  .connect(MONGO_DB_URL, { dbName: MONGO_DB_NAME })
+  .connect(config.database.url, { dbName: config.database.name })
   .then(() => console.log("MongoDB Connected"))
   .catch((error) => console.log("fail to connect mongoDB", error));
 
