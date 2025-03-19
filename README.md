@@ -34,6 +34,7 @@
 - **Frontend Repository**: [Blahblah Frontend](https://github.com/DonggunLim/Blahblah_front)
 - **Backend Repository**: [Blahblah Backend](https://github.com/DonggunLim/Blahblah_back)
 - **Figma**: [Blahblah Figma](https://www.figma.com/design/o7aSugrh85nW04kXW5SFyz/Untitled?node-id=0-1&p=f)
+- **WebSite**: [Blahblah](https://blahblah-front.vercel.app)
 
 ## 📌 설치 및 실행 방법
 
