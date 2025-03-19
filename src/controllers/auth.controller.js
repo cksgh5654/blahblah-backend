@@ -61,11 +61,9 @@ authController.get("/google-oauth-redirect", async (req, res) => {
       res.cookie("token", token, {
         maxAge: 60 * 1000 * 1000,
         httpOnly: true,
-        sameSite: "none",
-        secure: true,
         path: "/",
       });
-      res.redirect(config.app.frontEndPoint);
+      return res.json({ isError: false, message: "구글 로그인 성공" });
     }
   } catch (error) {
     console.log(error);
