@@ -61,6 +61,8 @@ authController.get("/google-oauth-redirect", async (req, res) => {
       res.cookie("token", token, {
         maxAge: 60 * 1000 * 1000,
         httpOnly: true,
+        sameSite: "none",
+        secure: true,
         path: "/",
       });
       res.redirect(config.app.frontEndPoint);
