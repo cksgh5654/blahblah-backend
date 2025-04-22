@@ -140,7 +140,7 @@
 
 ## 📌 링크
 
-- **Frontend Repository**: [Blahblah Frontend](https://github.com/cksgh5654/Blahblah_front)
+- **Frontend Repository**: [Blahblah Frontend](https://github.com/cksgh5654/Blahblah-front)
 - **Backend Repository**: [Blahblah Backend](https://github.com/cksgh5654/blahblah-backend)
 - **Figma**: [Blahblah Figma](https://www.figma.com/design/o7aSugrh85nW04kXW5SFyz/Untitled?node-id=0-1&p=f)
 - **WebSite**: [Blahblah](https://blahblah.chanhoportfolio.com)
