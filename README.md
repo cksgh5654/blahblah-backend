@@ -3,51 +3,164 @@
 **Blahblah**는 사용자가 직접 원하는 주제로 게시판을 만들고 커뮤니티를 제공해주는 웹 애플리케이션입니다.
 
 ## 🚀 기술 스택
+
 ### Frontend
+
 - React, TypeScript, Axios, React-Router-Dom
 
 ### Backend
+
 - Node.js, Express, MongoDB, JWT, Nodemailer
 
 ### DevOps
+
 - GCP, Nginx
 
 ## 📌 담당 기능
-### ✅ 인증 (로그인, 회원가입, Oauth, nodemailer)
-- [**Google OAuth인가를 활용한 사용자 인증 구현**](https://github.com/DonggunLim/Blahblah_front/wiki/Google-OAuth%EB%A5%BC-%ED%99%9C%EC%9A%A9%ED%95%9C-%EC%82%AC%EC%9A%A9%EC%9E%90-%EC%9D%B8%EC%A6%9D-%EA%B5%AC%ED%98%84)
-- [**JWT와 쿠키 기반 로그인 및 API 인증 구현**](https://github.com/DonggunLim/Blahblah_front/wiki/JWT%EC%99%80-%EC%BF%A0%ED%82%A4-%EA%B8%B0%EB%B0%98-%EB%A1%9C%EA%B7%B8%EC%9D%B8-%EB%B0%8F-API-%EC%9D%B8%EC%A6%9D-%EA%B5%AC%ED%98%84)
-- [**Nodemailer를 이용한 로컬 회원가입 및 이메일 인증 기능 구현**](https://github.com/DonggunLim/Blahblah_front/wiki/Nodemailer%EB%A5%BC-%EC%9D%B4%EC%9A%A9%ED%95%9C-%EC%9D%B4%EB%A9%94%EC%9D%BC-%EC%9D%B8%EC%A6%9D-%EA%B8%B0%EB%8A%A5-%EA%B5%AC%ED%98%84-%EB%B0%8F--%EC%9D%B4%EB%A9%94%EC%9D%BC-%ED%9A%8C%EC%9B%90%EA%B0%80%EC%9E%85-%EA%B5%AC%ED%98%84)
 
-### ✅ 프로필 페이지 (사용자 정보 조회 수정 기능)
-- [사용자 프로필 정보 표시](https://github.com/DonggunLim/Blahblah_front/blob/main/src/pages/ProfilePage.tsx) 
-- [프로필 이미지 변경 및 닉네임 수정 기능](https://github.com/DonggunLim/Blahblah_front/blob/main/src/pages/ProfileUpdatePage.tsx)
-- 사용자 활동 내역 표시 (게시물 조회, 댓글 조회, 개설한 게시판 조회)
-- 직접 개발한 UI 컴포넌트(Tabs, Avatar)로 UI 구성
+### 메인 페이지: UI 유연성과 데이터 로딩 최적화
 
-### ✅ 게시판 기능 [(어드민 대시보드 및 게시판 관리 기능 구현)](https://github.com/DonggunLim/Blahblah_front/wiki/%EC%96%B4%EB%93%9C%EB%AF%BC-%EB%8C%80%EC%8B%9C%EB%B3%B4%EB%93%9C-%EB%B0%8F-%EA%B2%8C%EC%8B%9C%ED%8C%90-%EA%B4%80%EB%A6%AC-%EA%B8%B0%EB%8A%A5-%EA%B5%AC%ED%98%84)
-- 어드민 대시보드 페이지: 가입한 모든 유저 관리 기능, 개설된 게시판 관리 기능
-- 게시판 관리기능 페이지: 게시판 가입한 사용자 및 게시글 관리, 공지사항 등록
-- ProtectedRoute를 활용하여 역할(Role) 기반 접근 제어
+#### 문제
 
+- 다양한 해상도에서 최적의 콘텐츠 노출 제공 필요
+- 대량의 게시판 데이터를 효율적으로 로드
+- 원하는 카테고리의 게시판을 빠르게 탐색 가능해야 함
+- URL 공유 및 새로고침 시 동일한 상태 유지 필요
+
+#### 해결 방식
+
+- **유연한 UI 설계**
+
+  - 게시판 카드에 대표 이미지를 크게 삽입하여 시각적 식별성 강화
+  - `width` 제한 제거로 고해상도에서 더 많은 카드 표시
+  - 카테고리 목록을 횡스크롤로 구성하여 모든 해상도에서 접근 용이
+
+- **데이터 로딩 최적화**
+
+  - 무한 스크롤(Infinite Scroll) 적용
+  - 스크롤 시점에 따라 필요한 데이터만 점진적으로 로드
+  - 초기 로딩 속도 향상 및 서버 부하 감소
+
+- **URL 상태 관리**
+
+  - `/게임` 형태의 카테고리 경로 사용
+  - 새로고침 및 공유 시 동일한 상태 유지
+
+- **탐색 편의성**
+  - "게시판 한눈에 보기" 페이지 추가
+  - 제목만 나열한 간소 뷰로 빠른 탐색 가능
+
+---
+
+### 헤더 검색창: 검색 부하와 사용자 편의성 문제 해결
+
+#### 문제
+
+- 게시판 이름을 빠르게 찾기 위한 검색 기능 필요
+- 자동완성 기능으로 인한 서버 과부하 우려
+
+#### 해결 방식
+
+- **검색 부하 최소화**
+  - 검색 결과 미리보기 기능 추가
+  - 실시간 자동완성 기능에 `300ms` 디바운스 적용
+  - 불필요한 API 호출 방지 및 서버 성능 최적화
+
+---
+
+### 검색 결과 페이지: 일관된 UX와 데이터 표시 문제 해결
+
+#### 문제
+
+- 메인 페이지와 UI 일관성을 유지하면서 검색 결과 표시
+- 다양한 해상도에서의 콘텐츠 최적 노출
+
+#### 해결 방식
+
+- **일관된 UI 제공**
+
+  - 메인 페이지와 유사한 UI로 사용자 익숙함 유지
+  - 게시판 대표 이미지를 강조하여 시각적 식별성 확보
+
+- **유연한 데이터 표시**
+
+  - `width` 제한 없이 고해상도 대응
+  - 디바이스 환경에 상관없는 사용자 경험 제공
+
+- **효율적인 데이터 로드**
+  - 페이지네이션 기반 데이터 분할
+  - 필요한 데이터만 로드하여 성능 최적화
+
+---
+
+### 게시판 생성 페이지: 품질 관리와 검색 유입 문제 해결
+
+#### 문제
+
+- 누구나 게시판 생성 가능해야 함
+- 부적절한 콘텐츠 노출 방지
+- SEO를 통한 검색 유입 강화
+
+#### 해결 방식
+
+- **콘텐츠 품질 관리**
+
+  - 주소 커스터마이징을 통한 검색 엔진 최적화(SEO)
+  - 관리자의 승인 이후에만 메인 페이지 노출
+
+- **사용자 친화적 설계**
+  - 직관적인 게시판 생성 플로우
+  - 초보 사용자도 쉽게 접근 가능
+
+---
+
+### 게시판 상세 페이지: 권한 관리와 데이터 로딩 문제 해결
+
+#### 문제
+
+- 사용자 권한(일반/관리자)에 따른 UI 제공 필요
+- 대량 게시글 데이터의 효율적 로딩
+
+#### 해결 방식
+
+- **동적 UI 제공**
+
+  - 미가입 사용자에게는 "가입하기" 버튼 노출
+  - 관리자에게는 "게시판 관리자 페이지" 버튼 제공
+  - 사용자 역할에 따른 명확한 UI
+
+- **게시글 유형 관리**
+
+  - 일반글 / 공지글 탭 구분
+  - 사용자 맞춤 콘텐츠 필터링 제공
+
+- **효율적인 데이터 로딩**
+  - 페이지네이션 적용
+  - 성능 저하 없이 대량 데이터 처리
 
 ## 📌 링크
-- **Frontend Repository**: [Blahblah Frontend](https://github.com/DonggunLim/Blahblah_front)
-- **Backend Repository**: [Blahblah Backend](https://github.com/DonggunLim/Blahblah_back)
+
+- **Frontend Repository**: [Blahblah Frontend](https://github.com/cksgh5654/Blahblah_front)
+- **Backend Repository**: [Blahblah Backend](https://github.com/cksgh5654/blahblah-backend)
 - **Figma**: [Blahblah Figma](https://www.figma.com/design/o7aSugrh85nW04kXW5SFyz/Untitled?node-id=0-1&p=f)
-- **WebSite**: [Blahblah](https://blahblah-front.vercel.app)
+- **WebSite**: [Blahblah](https://blahblah.chanhoportfolio.com)
 
 ## 📌 설치 및 실행 방법
 
 ### 프론트엔드 실행
+
 ```bash
 npm install
 npm run dev
 ```
+
 ### 백엔드 실행
+
 ```bash
 npm install
 node index.js
 ```
 
 ## 📌 ERD
+
 ![image](https://github.com/user-attachments/assets/1480918f-492d-4015-a44f-881bed17b689)
