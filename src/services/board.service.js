@@ -119,6 +119,7 @@ const getBoardDataByUrl = async (data) => {
       deletedAt: null,
       type: "basic",
     })
+      .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
       .populate("creator")
@@ -129,6 +130,7 @@ const getBoardDataByUrl = async (data) => {
       deletedAt: null,
       type: "notification",
     })
+      .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
       .populate("creator")
