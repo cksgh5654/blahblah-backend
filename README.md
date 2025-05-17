@@ -18,125 +18,47 @@
 
 ## 📌 담당 기능
 
-### 메인 페이지: UI 유연성과 데이터 로딩 최적화
+### [메인페이지](https://blahblah.chanhoportfolio.com)
 
-#### 문제
+- IntersectionObserver로 무한 스크롤을 구현해 데이터 로딩 속도를 최적화하고 사용자 경험을 개선
+- 카테고리 별 url 분할로 새로고침 시에도 동일한 카테고리 유지
 
-- 다양한 해상도에서 최적의 콘텐츠 노출 제공 필요
-- 대량의 게시판 데이터를 효율적으로 로드
-- 원하는 카테고리의 게시판을 빠르게 탐색 가능해야 함
-- URL 공유 및 새로고침 시 동일한 상태 유지 필요
-
-#### 해결 방식
-
-- **유연한 UI 설계**
-
-  - 게시판 카드에 대표 이미지를 크게 삽입하여 시각적 식별성 강화
-  - `width` 제한 제거로 고해상도에서 더 많은 카드 표시
-  - 카테고리 목록을 횡스크롤로 구성하여 모든 해상도에서 접근 용이
-
-- **데이터 로딩 최적화**
-
-  - 무한 스크롤(Infinite Scroll) 적용
-  - 스크롤 시점에 따라 필요한 데이터만 점진적으로 로드
-  - 초기 로딩 속도 향상 및 서버 부하 감소
-
-- **URL 상태 관리**
-
-  - `/게임` 형태의 카테고리 경로 사용
-  - 새로고침 및 공유 시 동일한 상태 유지
-
-- **탐색 편의성**
-  - "게시판 한눈에 보기" 페이지 추가
-  - 제목만 나열한 간소 뷰로 빠른 탐색 가능
+[메인페이지](https://github.com/cksgh5654/blahblah-front/blob/main/src/pages/MainPage.tsx)
+[무한스크롤 훅](https://github.com/cksgh5654/blahblah-ui-kit/blob/main/src/hooks/useInfinite.ts)
 
 ---
 
-### 헤더 검색창: 검색 부하와 사용자 편의성 문제 해결
+### 헤더 검색창
 
-#### 문제
+- 검색결과 미리보기에 디바운스를 사용하여 API 호출을 최적화해 서버 부하를 감소
 
-- 게시판 이름을 빠르게 찾기 위한 검색 기능 필요
-- 자동완성 기능으로 인한 서버 과부하 우려
-
-#### 해결 방식
-
-- **검색 부하 최소화**
-  - 검색 결과 미리보기 기능 추가
-  - 실시간 자동완성 기능에 `300ms` 디바운스 적용
-  - 불필요한 API 호출 방지 및 서버 성능 최적화
+[헤더](https://github.com/cksgh5654/blahblah-front/blob/main/src/components/Header.tsx)
+[디바운스 훅](https://github.com/cksgh5654/blahblah-ui-kit/blob/main/src/hooks/useDebounce.ts)
 
 ---
 
-### 검색 결과 페이지: 일관된 UX와 데이터 표시 문제 해결
+### [검색 결과 페이지](https://blahblah.chanhoportfolio.com/search/%EA%B2%8C%EC%8B%9C%ED%8C%90)
 
-#### 문제
+- useParams으로 검색결과에 대한 게시판 데이터 불러오기
 
-- 메인 페이지와 UI 일관성을 유지하면서 검색 결과 표시
-- 다양한 해상도에서의 콘텐츠 최적 노출
-
-#### 해결 방식
-
-- **일관된 UI 제공**
-
-  - 메인 페이지와 유사한 UI로 사용자 익숙함 유지
-  - 게시판 대표 이미지를 강조하여 시각적 식별성 확보
-
-- **유연한 데이터 표시**
-
-  - `width` 제한 없이 고해상도 대응
-  - 디바이스 환경에 상관없는 사용자 경험 제공
-
-- **효율적인 데이터 로드**
-  - 페이지네이션 기반 데이터 분할
-  - 필요한 데이터만 로드하여 성능 최적화
+[검색 결과 페이지](https://github.com/cksgh5654/blahblah-front/blob/main/src/pages/SearchPage.tsx)
 
 ---
 
-### 게시판 생성 페이지: 품질 관리와 검색 유입 문제 해결
+### [게시판 상세 페이지](https://blahblah.chanhoportfolio.com/board/NewJeans)
 
-#### 문제
+- 페이지네이션으로 게시글을 페이지로 분할하여 데이터 로드
 
-- 누구나 게시판 생성 가능해야 함
-- 부적절한 콘텐츠 노출 방지
-- SEO를 통한 검색 유입 강화
-
-#### 해결 방식
-
-- **콘텐츠 품질 관리**
-
-  - 주소 커스터마이징을 통한 검색 엔진 최적화(SEO)
-  - 관리자의 승인 이후에만 메인 페이지 노출
-
-- **사용자 친화적 설계**
-  - 직관적인 게시판 생성 플로우
-  - 초보 사용자도 쉽게 접근 가능
+[게시판 상세 페이지](https://github.com/cksgh5654/blahblah-front/blob/main/src/pages/BoardPage.tsx)
+[페이지네이션](https://github.com/cksgh5654/blahblah-ui-kit/tree/main/src/components/Pagination)
 
 ---
 
-### 게시판 상세 페이지: 권한 관리와 데이터 로딩 문제 해결
+### [게시판 생성 페이지](https://blahblah.chanhoportfolio.com/create-board)
 
-#### 문제
+- 게시판 생성 시 사용자 정의 URL을 설정 가능하게 하여 검색 엔진 크롤링 최적화
 
-- 사용자 권한(일반/관리자)에 따른 UI 제공 필요
-- 대량 게시글 데이터의 효율적 로딩
-
-#### 해결 방식
-
-- **동적 UI 제공**
-
-  - 미가입 사용자에게는 "가입하기" 버튼 노출
-  - 관리자에게는 "게시판 관리자 페이지" 버튼 제공
-  - 사용자 역할에 따른 명확한 UI
-
-- **게시글 유형 관리**
-
-  - 일반글 / 공지글 탭 구분
-  - 사용자 맞춤 콘텐츠 필터링 제공
-
-- **효율적인 데이터 로딩**
-  - 페이지네이션 적용
-  - 성능 저하 없이 대량 데이터 처리
+[게시판 생성 페이지](https://github.com/cksgh5654/blahblah-front/blob/main/src/pages/CreateBoardPage.tsx)
 
 ## 📌 링크
 
@@ -161,7 +83,3 @@ npm run dev
 npm install
 node index.js
 ```
-
-## 📌 ERD
-
-![image](https://github.com/user-attachments/assets/1480918f-492d-4015-a44f-881bed17b689)
